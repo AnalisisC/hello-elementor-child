@@ -10,11 +10,11 @@ if (! defined('ABSPATH')) {
 
 define('HELLO_ELEMENTOR_VERSION', '2.7.1');
 
-if (! isset($content_width)) {
+if (!isset($content_width)) {
     $content_width = 800; // Pixels.
 }
 
-if (! function_exists('hello_elementor_setup')) {
+if (!function_exists('hello_elementor_setup')) {
     /**
      * Set up theme support.
      * @return void
@@ -81,12 +81,9 @@ if (! function_exists('hello_elementor_setup')) {
                 // WooCommerce in general.
                 add_theme_support('woocommerce');
                 // Enabling WooCommerce product gallery features (are off by default since WC 3.0.0).
-                // zoom.
-                add_theme_support('wc-product-gallery-zoom');
-                // lightbox.
-                add_theme_support('wc-product-gallery-lightbox');
-                // swipe.
-                add_theme_support('wc-product-gallery-slider');
+                add_theme_support('wc-product-gallery-zoom');// zoom.
+                add_theme_support('wc-product-gallery-lightbox');// lightbox.
+                add_theme_support('wc-product-gallery-slider'); // swipe.
             }
         }
     }
@@ -104,7 +101,7 @@ function hello_maybe_update_theme_version_in_db()
     }
 }
 
-if (! function_exists('hello_elementor_scripts_styles')) {
+if (!function_exists('hello_elementor_scripts_styles')) {
     /**
      * Theme Scripts & Styles.
      * @return void
@@ -118,7 +115,6 @@ if (! function_exists('hello_elementor_scripts_styles')) {
             'hello_elementor_enqueue_style'
         );
         $min_suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
-
         if (apply_filters('hello_elementor_enqueue_style', $enqueue_basic_style)) {
             wp_enqueue_style(
                 'hello-elementor',
@@ -546,6 +542,8 @@ add_filter('login_errors', 'error_handler');
 //     //   wp_enqueue_script( 'custom-login', get_stylesheet_directory_uri() . '/style-login.js' );
 // }
 // add_action('login_enqueue_scripts', 'my_login_stylesheet');
+
+
 add_action('login_form_middle', 'add_lost_password_link');
 function add_lost_password_link()
 {
@@ -554,36 +552,78 @@ function add_lost_password_link()
 
 function nodecharts_login_page()
 {
-
-    if (!current_user_can('administrator')) {
-        $hostprotocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http'). '://'.$_SERVER["HTTP_HOST"] ;
-        $redirect = (get_locale() === 'es_ES' ? $hostprotocol . '/estudio' : $hostprotocol . '/en/studio');
-        wp_redirect($redirect);
+    if (!is_user_logged_in()) {
+        if (!current_user_can('administrator')) {
+            wp_redirect(home_url(get_locale() === 'es_ES' ? $hostprotocol . '/estudio' : $hostprotocol . '/en/studio'));
+        }
+        $args = array(
+          'echo'           => true,
+          'remember'       => true,
+          'redirect'       => $redirect,
+          'form_id'        => 'loginform',
+          'id_username'    => 'user_login',
+          'id_password'    => 'user_pass',
+          'id_remember'    => 'rememberme',
+          'id_submit'      => 'wp-submit',
+          'label_username' => __(''),
+          'label_password' => __(''),
+          'label_remember' => __('Remember Me'),
+          'label_log_in'   => __('Log In'),
+          'value_username' => '',
+          'value_remember' => true
+        );
+        wp_login_form($args);
+        $cdn = 'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/';
+        wp_enqueue_script(
+            'jslogin',
+            get_template_directory_uri() .'/assets/js/login.js',
+            array('jquery'),
+            '1.0',
+            true
+        );
+    } else {
+        echo apply_filters('wpml_current_language', null) == 'en'
+        ? '<h4>User logged in. Redirecting to the Studio</h4>
+        <script type="text/javascript">location.href="'.home_url('/en/studio').'"</script>' :
+        '<h4>Sesión iniciada. Redirigiendo al Estudio</h4>
+        <script type="text/javascript">location.href="'.home_url('/estudio').'"</script>';
     }
-    $args = array(
-      'echo'           => true,
-      'remember'       => true,
-      'redirect'       => $redirect,
-      'form_id'        => 'loginform',
-      'id_username'    => 'user_login',
-      'id_password'    => 'user_pass',
-      'id_remember'    => 'rememberme',
-      'id_submit'      => 'wp-submit',
-      'label_username' => __(''),
-      'label_password' => __(''),
-      'label_remember' => __('Remember Me'),
-      'label_log_in'   => __('Log In'),
-      'value_username' => '',
-      'value_remember' => true
-    );
-    wp_login_form($args);
-    $cdn = 'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/';
-    wp_enqueue_script(
-        'jslogin',
-        get_template_directory_uri() .'/assets/js/login.js',
-        array('jquery'),
-        '1.0',
-        true
-    );
 }
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
+
+
+function redirect_login_page()
+{
+    $url = basename($_SERVER['REQUEST_URI']); // get requested URL
+    isset($_REQUEST['redirect_to']) ? ($url = "wp-login.php") : null; // if users send request to wp-admin
+    if($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['customer-logout'])) {
+        wp_logout();
+        $url = apply_filters('wpml_current_language', null) == 'en'
+        ? '/en/sign-in' : '/iniciar-sesion';
+        wp_redirect(home_url($url));
+        exit;
+    }
+
+    // Avoid infinite redirection when user is not logged in
+    if ($url == "wp-login.php" && isset($_GET['redirect_to'])) {
+        wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
+        ? '/en/sign-in' : '/iniciar-sesion'));
+        exit;
+    }
+
+    if ($url  == "wp-login.php" && isset($_POST['log'], $_POST['pwd'])) {
+        $user = wp_authenticate($_POST['log'], $_POST['pwd']);
+        if (!is_wp_error($user)) {
+            wp_set_current_user($user->ID);
+            $redirect = apply_filters('wpml_current_language', null) == 'en'
+            ? '/en/studio' : '/estudio';
+            wp_redirect(home_url($redirect));
+        } else {
+            wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
+            ? '/en/sign-in' : '/iniciar-sesion'));
+        }
+    }
+
+    // do not add this without checkin admin is on wp_redirect(home_url('/iniciar-sesion'));
+}
+add_action('init', 'redirect_login_page');

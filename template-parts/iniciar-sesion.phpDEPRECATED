@@ -34,12 +34,11 @@ function display_error_message($err_code)
  */
 
 get_header();
-
+die();
+$redirect = (get_locale() === 'es_ES' ? '/estudio' : '/en/studio');
 if (!is_user_logged_in()) {
-    $lang = get_locale();
-    $redirect = ($lang === 'es_ES' ? '/estudio' : '/en/studio');
     $args = [
-        'redirect' => $redirect,
+        'redirect' => home_url($redirect),
         'form_id' => 'loginform-custom',
         'label_username' => __('Username:'),
         'label_password' => __('Password:'),
@@ -48,6 +47,8 @@ if (!is_user_logged_in()) {
         'remember' => true
     ];
     wp_login_form($args);
+} else {
+    wp_redirect(home_url($redirect));
 }
 get_footer();
 
