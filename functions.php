@@ -623,8 +623,9 @@ function redirect_login_page()
     }
 
     if ($url == "wp-login.php" && $_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['loginSocial'])) {
-
-
+        $redirect = apply_filters('wpml_current_language', null) == 'en'
+            ? '/en/studio' : '/estudio';
+        wp_redirect(home_url($redirect));
     }
 
     // do not add this without checkin admin is on wp_redirect(home_url('/iniciar-sesion'));
