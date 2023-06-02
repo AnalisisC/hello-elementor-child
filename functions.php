@@ -584,6 +584,7 @@ function nodecharts_login_page()
         // Note: Redirections won't work here because header was already sent. ob_clean... neither works
         echo '<script>window.location.href="'.home_url((apply_filters('wpml_current_language', null) == 'en'
               ? '/en/studio' : '/estudio')) . '"</script>';
+        exit();
     }
 }
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
