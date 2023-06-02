@@ -583,9 +583,9 @@ function nodecharts_login_page()
     } else {
         echo apply_filters('wpml_current_language', null) == 'en'
         ? '<h4>User logged in. Redirecting to the Studio</h4>
-        <script type="text/javascript">location.href="'.home_url('/en/studio').'"</script>' :
+        <script type="text/javascript">console.log("Redirect");location.href="'.home_url('/en/studio').'"</script>' :
         '<h4>Sesión iniciada. Redirigiendo al Estudio</h4>
-        <script type="text/javascript">location.href="'.home_url('/estudio').'"</script>';
+        <script type="text/javascript">console.log("Redirect");location.href="'.home_url('/estudio').'"</script>';
     }
 }
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
