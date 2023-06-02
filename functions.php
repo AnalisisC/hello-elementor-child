@@ -582,8 +582,14 @@ function nodecharts_login_page()
         );
     } elseif(!isset($_GET['action'])) { //Edit with elementor
         // Note: Redirections won't work here because header was already sent. ob_clean... neither works
-        echo '<script>window.location.href="'.home_url((apply_filters('wpml_current_language', null) == 'en'
-              ? '/en/studio' : '/estudio')) . '"</script>';
+        if (apply_filters('wpml_current_language', null) == 'en') {
+            echo '<div class="elementor-widget-container">
+            <h3>User authenticated. Redirecting...</h3></div>';
+            echo '<script>window.location.href="/en/studio"</script>';
+        } else {
+            echo '<h3>Usuario autenticado. Redirigiendo...</h3>';
+            echo '<script>window.location.href="/estudio"</script>';
+        }
         exit();
     }
 }
