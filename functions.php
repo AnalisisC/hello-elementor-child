@@ -568,7 +568,7 @@ function nodecharts_login_page()
           'label_remember' => __('Remember Me'),
           'label_log_in'   => __('Log In'),
           'value_username' => '',
-          'value_remember' => true
+          'value_remember' => false
         );
 
         wp_login_form($args); //@todo add cdn feature
@@ -580,15 +580,14 @@ function nodecharts_login_page()
             '1.0',
             true
         );
-    } else {
-        if (!current_user_can('administrator')) {
-            echo apply_filters('wpml_current_language', null) == 'en'
-            ? '<h4>User logged in. Redirecting to the Studio</h4>
+    } elseif (!current_user_can('administrator')) {
+        echo apply_filters('wpml_current_language', null) == 'en'
+        ? '<h4>User logged in. Redirecting to the Studio</h4>
         <script type="text/javascript">location.href="'.home_url('/en/studio').'"</script>' :
-            '<h4>Sesión iniciada. Redirigiendo al Estudio</h4>
+        '<h4>Sesión iniciada. Redirigiendo al Estudio</h4>
         <script type="text/javascript">location.href="'.home_url('/estudio').'"</script>';
-        }
     }
+
 }
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
 
@@ -606,7 +605,7 @@ function redirect_login_page()
     }
 
     // Avoid infinite redirection when user is not logged in
-    if ($url == "wp-login.php" && isset($_GET['redirect_to'])) {
+    if ($url == "wp-login.php" && $_SERVER['REQUEST_METHOD'] && isset($_GET['redirect_to'])) {
         wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
         ? '/en/sign-in' : '/iniciar-sesion'));
         exit;
@@ -623,6 +622,11 @@ function redirect_login_page()
             wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
             ? '/en/sign-in' : '/iniciar-sesion'));
         }
+    }
+
+    if ($url == "wp-login.php" && $_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['loginSocial'])) {
+
+
     }
 
     // do not add this without checkin admin is on wp_redirect(home_url('/iniciar-sesion'));
