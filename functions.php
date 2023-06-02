@@ -559,7 +559,8 @@ function nodecharts_login_page()
         $args = array(
           'echo'           => true,
           'remember'       => true,
-          'redirect'       => $redirect,
+          'redirect'       => home_url((apply_filters('wpml_current_language', null) == 'en'
+          ? '/en/studio' : '/estudio')),
           'form_id'        => 'loginform',
           'id_username'    => 'user_login',
           'id_password'    => 'user_pass',
@@ -572,8 +573,9 @@ function nodecharts_login_page()
           'value_username' => '',
           'value_remember' => true
         );
-        wp_login_form($args);
-        $cdn = 'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/';
+         
+        wp_login_form($args); //@todo add cdn feature
+        //$cdn = 'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/';
         wp_enqueue_script(
             'jslogin',
             get_template_directory_uri() .'/assets/js/login.js',
