@@ -587,11 +587,11 @@ function nodecharts_login_page()
         <script type="text/javascript">location.href="'.home_url('/en/studio').'"</script>' :
         '<h4>Sesión iniciada. Redirigiendo al Estudio</h4>
         <script type="text/javascript">location.href="'.home_url('/estudio').'"</script>';
+    } else {
+        echo "Usuario autenticado";
     }
-
 }
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
-
 
 function redirect_login_page()
 {
