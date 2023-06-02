@@ -581,6 +581,7 @@ function nodecharts_login_page()
             true
         );
     } elseif (!current_user_can('administrator')) {
+        echo "Usuario autenticado";
         echo apply_filters('wpml_current_language', null) == 'en'
         ? '<h4>User logged in. Redirecting to the Studio</h4>
         <script type="text/javascript">location.href="'.home_url('/en/studio').'"</script>' :
