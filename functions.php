@@ -582,17 +582,16 @@ function nodecharts_login_page()
         );
     } elseif(!isset($_GET['action'])) { //Edit with elementor
         // Note: Redirections won't work here because header was already sent. ob_clean... neither works
+        echo '<style>div[class*="elementor-"] h3 {margin-top: 200px;} .wp-image-2346{display:none !important} </style><div style="color:rgb(0, 102, 255); text-align: center; margin-top: 50px;" class="elementor-element elementor-widget elementor-widget-text-editor" data-element_type="widget" data-widget_type="text-editor.default">';
         if (apply_filters('wpml_current_language', null) == 'en') {
-            echo '<div class="elementor-widget-container">
-            <h3>User authenticated. Redirecting...</h3></div>';
-            echo '<script>window.location.href="/en/studio"</script>';
-        } else {
-            echo '<h3>Usuario autenticado. Redirigiendo...</h3>';
+            echo '<div class="elementor-widget-container"><h3>User authenticated. Redirecting...</h3></div></div>';
             echo '<script>window.location.href="/estudio"</script>';
+        } else {
+            echo '<div class="elementor-widget-container"><h3>Usuario autenticado. Redirigiendo...</h3></div></div>';
+            echo '<script>jQuery("h3:contains(Inicia sesión)").hide();window.location.href="/estudio"</script>';
         }
         exit();
-    }
-}
+    }}
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
 
 function redirect_login_page()
