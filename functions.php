@@ -575,7 +575,7 @@ function nodecharts_login_page()
         wp_enqueue_script(
             'jslogin',
             str_contains($_SERVER["HTTP_HOST"], 'nodecharts.com') ?
-            'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/js/login.js' :
+            'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/themes/hello-elementor/assets/js/login.js' :
             get_template_directory_uri() .'/assets/js/login.js',
             array('jquery'),
             '1.0',
