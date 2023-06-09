@@ -256,23 +256,27 @@ function mostrar_principiante_mensual($atts)
     add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
         if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
-            $user_id = get_current_user_id();
-            $subscription = getactivesubscription2($user_id);
-            if ($subscription == "Principiante Mensual" || $subscription == "Principiante Anual" || $subscription == "Experto Mensual" || $subscription == "Experto Anual" || $subscription == "Profesional Anual") {
+            $subscription = getactivesubscription2(get_current_user_id());
+            if ($subscription == "Principiante Mensual" || $subscription == "Principiante Anual" ||
+            $subscription == "Experto Mensual" || $subscription == "Experto Anual" || $subscription == "Profesional Anual") {
                 return '<div><p><b>'.esc_html__("Active!", 'nodechartsfam').'</b></p></div>';
             } else {
-                return '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" data-product_id="356" data-product_sku="principiante-mensual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>'. esc_html__("Buy!", 'nodechartsfam').'</p></div></a>';
+                return '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" 
+                data-product_id="356" data-product_sku="principiante-mensual" 
+                class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
+                <div class="boton"><p>'. esc_html__("Buy!", 'nodechartsfam').'</p></div></a>';
             }
         } else {
             return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
-
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
         if ($my_current_lang == "es") {
-            return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'.esc_html__("Sign up", 'nodechartsfam').'</p></div></a>';
+            return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'.
+            esc_html__("Sign up", 'nodechartsfam').'</p></div></a>';
         } else {
-            return '<a class="link-pricing" href="https://nodecharts.com/en/sign-up"><div class="boton"><p>'.esc_html__("Sign up", 'nodechartsfam').'</p></div></a>';
+            return '<a class="link-pricing" href="https://nodecharts.com/en/sign-up"><div class="boton"><p>'.
+            esc_html__("Sign up", 'nodechartsfam').'</p></div></a>';
         }
     }
 }
@@ -459,12 +463,14 @@ function getactivesubscription2($userId)
     return $nombremembresia;
 }
 
-
-//REDIRECCIÓN A INICIO DE SESIÓN DESPUÉS DE CERRAR SESIÓN
+/**
+ * URL redirect after user logout
+ */
 add_action('wp_logout', 'ps_redirect_after_logout');
 function ps_redirect_after_logout()
 {
-    wp_redirect('https://nodecharts.com/iniciar-sesion/');
+    wp_redirect(home_url((apply_filters('wpml_current_language', null) == 'en'
+    ? '/en/sign-in' : '/iniciar-sesion'))) ;
     exit();
 }
 
@@ -509,7 +515,7 @@ add_filter('login_headerurl', 'nodecharts_custom_login_url');
  */
 function nodecharts_login_logo_url_redirect()
 {
-    return 'https://nodecharts.com/';
+    return home_url();
 }
 add_filter('login_headertitle', 'nodecharts_login_logo_url_redirect');
 
@@ -544,11 +550,12 @@ add_filter('login_errors', 'error_handler');
 // add_action('login_enqueue_scripts', 'my_login_stylesheet');
 
 
-add_action('login_form_middle', 'add_lost_password_link');
-function add_lost_password_link()
-{
-    return '<a href="/wp-login.php?action=lostpassword">Forgot Your Password?</a>';
-}
+// ENABLE THIS IF YOU WANT TO ADD LINK TO FORGOT PASSWORD
+//add_action('login_form_middle', 'add_lost_password_link');
+// function add_lost_password_link()
+// {
+//     return '<a href="/wp-login.php?action=lostpassword">Forgot Your Password?</a>';
+// }
 
 function nodecharts_login_page()
 {
@@ -570,15 +577,13 @@ function nodecharts_login_page()
           'value_username' => '',
           'value_remember' => false
         );
-
         wp_login_form($args); //@todo add cdn feature
-        //$cdn = 'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/';
         wp_enqueue_script(
-            'jslogin',
-            get_template_directory_uri() .'/assets/js/login.js',
+            'nodechartslogin',
+            "https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/js/login.js",
             array('jquery'),
             '1.0',
-            true
+            null
         );
     } elseif(!isset($_GET['action'])) { //Edit with elementor
         // Note: Redirections won't work here because header was already sent. ob_clean... neither works
@@ -591,7 +596,8 @@ function nodecharts_login_page()
             echo '<script>jQuery("h3:contains(Inicia sesión)").hide();window.location.href="/estudio"</script>';
         }
         exit();
-    }}
+    }
+}
 add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
 
 function redirect_login_page()
