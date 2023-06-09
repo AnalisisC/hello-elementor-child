@@ -191,24 +191,24 @@ function hello_register_customizer_functions()
 }
 add_action('init', 'hello_register_customizer_functions');
 
-if (! function_exists('hello_elementor_check_hide_title')) {
-    /**
-     * Check hide title.
-     * @param bool $val default value.
-     * @return bool
-     */
-    function hello_elementor_check_hide_title($val)
-    {
-        if (defined('ELEMENTOR_VERSION')) {
-            $current_doc = Elementor\Plugin::instance()->documents->get(get_the_ID());
-            if ($current_doc && 'yes' === $current_doc->get_settings('hide_title')) {
-                $val = false;
-            }
-        }
-        return $val;
-    }
-}
-add_filter('hello_elementor_page_title', 'hello_elementor_check_hide_title');
+// if (! function_exists('hello_elementor_check_hide_title')) {
+//     /**
+//      * Check hide title.
+//      * @param bool $val default value.
+//      * @return bool
+//      */
+//     function hello_elementor_check_hide_title($val)
+//     {
+//         if (defined('ELEMENTOR_VERSION')) {
+//             $current_doc = Elementor\Plugin::instance()->documents->get(get_the_ID());
+//             if ($current_doc && 'yes' === $current_doc->get_settings('hide_title')) {
+//                 $val = false;
+//             }
+//         }
+//         return $val;
+//     }
+// }
+// add_filter('hello_elementor_page_title', 'hello_elementor_check_hide_title');
 
 /**
  * Wrapper function to deal with backwards compatibility.
@@ -525,29 +525,6 @@ add_filter('login_headertitle', 'nodecharts_login_logo_url_redirect');
  */
 add_filter('login_display_language_dropdown', '__return_false');
 
-/**
- * Login Error Handling
- * @author Miguel Gil  <miguelgilmartinez@gmail.com>
- * @return void
- */
-function error_handler()
-{
-    $login_page  = home_url('/login');
-    global $errors;
-    $err_codes = $errors->get_error_codes(); // get WordPress built-in error codes
-    $_SESSION["err_codes"] =  $err_codes;
-    wp_redirect($login_page); // keep users on the same page
-    exit;
-}
-add_filter('login_errors', 'error_handler');
-
-
-// function my_login_stylesheet()
-// {
-//     wp_enqueue_style('custom-login', get_stylesheet_directory_uri() . '/iniciar-sesion.css');
-//     //   wp_enqueue_script( 'custom-login', get_stylesheet_directory_uri() . '/style-login.js' );
-// }
-// add_action('login_enqueue_scripts', 'my_login_stylesheet');
 
 
 // ENABLE THIS IF YOU WANT TO ADD LINK TO FORGOT PASSWORD
@@ -557,9 +534,27 @@ add_filter('login_errors', 'error_handler');
 //     return '<a href="/wp-login.php?action=lostpassword">Forgot Your Password?</a>';
 // }
 
+
+/**
+ * Login Error Handling
+ * @author Miguel Gil  <miguelgilmartinez@gmail.com>
+ * @return void
+ */
+
+add_filter('wp_login_failed', function () {
+    wp_redirect(apply_filters('wpml_current_language', null) == 'en'
+    ? '/en/sign-in?error=1' : '/iniciar-sesion?error=1');
+    exit(); //Fuckin' spaguetti code
+});
+
 function nodecharts_login_page()
 {
     if (!is_user_logged_in()) {
+        if (isset($_REQUEST['error'])) {
+            echo(apply_filters('wpml_current_language', null) == 'en' ?
+            '<div class="error-login">Error user or password</div>' :
+            '<div class="error-login">Error en usuario o contraseña</div>');
+        }
         $args = array(
           'echo'           => true,
           'remember'       => true,
@@ -574,20 +569,21 @@ function nodecharts_login_page()
           'label_password' => __(''),
           'label_remember' => __('Remember Me'),
           'label_log_in'   => __('Log In'),
-          'value_username' => '',
           'value_remember' => false
         );
-        wp_login_form($args); //@todo add cdn feature
+        wp_login_form($args);
         wp_enqueue_script(
-            'nodechartslogin',
-            "https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/js/login.js",
+            'jslogin',
+            str_contains($_SERVER["HTTP_HOST"], 'nodecharts.com') ?
+            'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/plugins/nodechartsfam/js/login.js' :
+            get_template_directory_uri() .'/assets/js/login.js',
             array('jquery'),
             '1.0',
-            null
+            true
         );
     } elseif(!isset($_GET['action'])) { //Edit with elementor
-        // Note: Redirections won't work here because header was already sent. ob_clean... neither works
-        echo '<style>div[class*="elementor-"] h3 {margin-top: 200px;} .wp-image-2346{display:none !important} </style><div style="color:rgb(0, 102, 255); text-align: center; margin-top: 50px;" class="elementor-element elementor-widget elementor-widget-text-editor" data-element_type="widget" data-widget_type="text-editor.default">';
+        // Miguel: Redirections won't work here because header was already sent. ob_clean... neither works
+        echo '<style>div[class*="elementor-"] h3 {margin-top: 200px;} .wp-image-2346{display:none !important}</style><div style="color:rgb(0, 102, 255); text-align: center; margin-top: 50px;" class="elementor-element elementor-widget elementor-widget-text-editor" data-element_type="widget" data-widget_type="text-editor.default">';
         if (apply_filters('wpml_current_language', null) == 'en') {
             echo '<div class="elementor-widget-container"><h3>User authenticated. Redirecting...</h3></div></div>';
             echo '<script>window.location.href="/estudio"</script>';

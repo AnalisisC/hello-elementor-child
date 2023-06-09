@@ -674,3 +674,15 @@ footer .site-navigation ul.menu a {
 .site-header + .elementor {
   min-height: calc(100vh - 320px);
 }
+.error-login {
+  text-align: center;
+  font-size: 0.7em;
+  font-weight: 500;
+  line-height: 1.4em;
+  letter-spacing: 0.4px;
+  fill: var(--e-global-color-secondary);
+  color: #0066FF;
+  border: red 1px solid;
+  padding: 0.8em 2em 0.8em 2em; 
+  background-color: white;
+}
