@@ -76,7 +76,12 @@ if (!function_exists('hello_elementor_setup')) {
             /*
              * WooCommerce.
              */
-            $hook_result = apply_filters_deprecated('elementor_hello_theme_add_woocommerce_support', [true], '2.0', 'hello_elementor_add_woocommerce_support');
+            $hook_result = apply_filters_deprecated(
+                'elementor_hello_theme_add_woocommerce_support',
+                [true],
+                '2.0',
+                'hello_elementor_add_woocommerce_support'
+            );
             if (apply_filters('hello_elementor_add_woocommerce_support', $hook_result)) {
                 // WooCommerce in general.
                 add_theme_support('woocommerce');
@@ -212,9 +217,9 @@ if (!function_exists('hello_elementor_body_open')) {
 add_shortcode('basico', 'mostrar_basico');
 function mostrar_basico($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     //    add_filter('widget_text', 'apply_shortcodes');
-    if ($user_login) {
+    if ($current_user->ID) {
         return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
     } else {
         if (apply_filters('wpml_current_language', null) == "es") {
@@ -231,9 +236,9 @@ function mostrar_basico($atts)
 add_shortcode('principiantemensual', 'mostrar_principiante_mensual');
 function mostrar_principiante_mensual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // add_filter('widget_text', 'apply_shortcodes');
-    if ($user_login) {
+    if ($current_user->ID) {
         $subscription = getactivesubscription2($current_user->ID);
         if (
             $subscription == "Principiante Mensual" || $subscription == "Principiante Anual" ||
@@ -261,9 +266,9 @@ function mostrar_principiante_mensual($atts)
 add_shortcode('principianteanual', 'mostrar_principiante_anual');
 function mostrar_principiante_anual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // add_filter('widget_text', 'apply_shortcodes');
-    if ($user_login) {
+    if ($current_user->ID) {
         if (
             in_array(
                 getactivesubscription2($current_user->ID),
@@ -289,11 +294,11 @@ function mostrar_principiante_anual($atts)
 add_shortcode('expertomensual', 'mostrar_experto_mensual');
 function mostrar_experto_mensual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // wp_get_current_user();
     // add_filter('widget_text', 'apply_shortcodes');
 
-    if ($user_login) {
+    if ($current_user->ID) {
         $subscription = getactivesubscription2($current_user->ID);
         if (
             $subscription == "Experto Mensual" || $subscription == "Experto Anual"
@@ -304,8 +309,7 @@ function mostrar_experto_mensual($atts)
             return '<a rel="nofollow" href="?add-to-cart=360" data-quantity="1" data-product_id="360" data-product_sku="experto-mensual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
-        $my_current_lang = apply_filters('wpml_current_language', null);
-        if ($my_current_lang == "es") {
+        if (apply_filters('wpml_current_language', null) == "es") {
             return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
                 . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
         } else {
@@ -318,12 +322,10 @@ function mostrar_experto_mensual($atts)
 add_shortcode('expertoanual', 'mostrar_experto_anual');
 function mostrar_experto_anual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // wp_get_current_user();
     add_filter('widget_text', 'apply_shortcodes');
-
-    if ($user_login) {
-
+    if ($current_user->ID) {
         $subscription = getactivesubscription2($current_user->ID);
         if ($subscription == "Experto Anual" || $subscription == "Profesional Anual") {
             return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
@@ -346,10 +348,10 @@ function mostrar_experto_anual($atts)
 add_shortcode('profesionalmensual', 'mostrar_profesional_mensual');
 function mostrar_profesional_mensual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // wp_get_current_user();
     // add_filter('widget_text', 'apply_shortcodes');
-    if ($user_login) {
+    if ($current_user->ID) {
         $subscription = getactivesubscription2($current_user->ID);
         if ($subscription == "Profesional Mensual") {
             return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
@@ -371,16 +373,15 @@ function mostrar_profesional_mensual($atts)
 add_shortcode('profesionalanual', 'mostrar_profesional_anual');
 function mostrar_profesional_anual($atts)
 {
-    global $current_user, $user_login;
+    global $current_user;
     // wp_get_current_user();
     // add_filter('widget_text', 'apply_shortcodes');
-    if ($user_login) {
+    if ($current_user->ID) {
         if (getactivesubscription2($current_user->ID) == "Profesional Anual") {
             return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
         } else {
             return '<a rel="nofollow" href="?add-to-cart=362" data-quantity="1" data-product_id="362" data-product_sku="profesional-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
         }
-
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
         if ($my_current_lang == "es") {
@@ -393,7 +394,7 @@ function mostrar_profesional_anual($atts)
     }
 }
 
-function getactivesubscription2($userId)
+function getactivesubscription2(int $userId)
 {
     $nombremembresia = get_transient('getActiveSubs' . $userId);
     if (!$nombremembresia) {
@@ -405,10 +406,11 @@ function getactivesubscription2($userId)
                 foreach ($items as $item) {
                     $product = $item->get_product();
                     $nombremembresia = $product->get_name();
+                    break 2;
                 }
             }
         }
-        set_transient('getActiveSubscription' . $userId, $nombremembresia, 60);
+        set_transient('getActiveSubs' . $userId, $nombremembresia, 60);
         // die(var_dump($nombremembresia));
     }
     return $nombremembresia;
