@@ -234,7 +234,7 @@ function mostrar_basico($atts)
 
 
 add_shortcode('principiantemensual', 'mostrar_principiante_mensual');
-function mostrar_principiante_mensual($atts)
+function mostrar_principiante_mensual()
 {
     global $current_user;
     // add_filter('widget_text', 'apply_shortcodes');
@@ -264,7 +264,7 @@ function mostrar_principiante_mensual($atts)
 }
 
 add_shortcode('principianteanual', 'mostrar_principiante_anual');
-function mostrar_principiante_anual($atts)
+function mostrar_principiante_anual()
 {
     global $current_user;
     // add_filter('widget_text', 'apply_shortcodes');
@@ -292,7 +292,7 @@ function mostrar_principiante_anual($atts)
 }
 
 add_shortcode('expertomensual', 'mostrar_experto_mensual');
-function mostrar_experto_mensual($atts)
+function mostrar_experto_mensual()
 {
     global $current_user;
     // wp_get_current_user();
@@ -320,7 +320,7 @@ function mostrar_experto_mensual($atts)
 }
 
 add_shortcode('expertoanual', 'mostrar_experto_anual');
-function mostrar_experto_anual($atts)
+function mostrar_experto_anual()
 {
     global $current_user;
     // wp_get_current_user();
@@ -346,7 +346,7 @@ function mostrar_experto_anual($atts)
 }
 
 add_shortcode('profesionalmensual', 'mostrar_profesional_mensual');
-function mostrar_profesional_mensual($atts)
+function mostrar_profesional_mensual()
 {
     global $current_user;
     // wp_get_current_user();
@@ -371,7 +371,7 @@ function mostrar_profesional_mensual($atts)
 
 
 add_shortcode('profesionalanual', 'mostrar_profesional_anual');
-function mostrar_profesional_anual($atts)
+function mostrar_profesional_anual()
 {
     global $current_user;
     // wp_get_current_user();
