@@ -191,6 +191,24 @@ function hello_register_customizer_functions()
 }
 add_action('init', 'hello_register_customizer_functions');
 
+// if (! function_exists('hello_elementor_check_hide_title')) {
+//     /**
+//      * Check hide title.
+//      * @param bool $val default value.
+//      * @return bool
+//      */
+//     function hello_elementor_check_hide_title($val)
+//     {
+//         if (defined('ELEMENTOR_VERSION')) {
+//             $current_doc = Elementor\Plugin::instance()->documents->get(get_the_ID());
+//             if ($current_doc && 'yes' === $current_doc->get_settings('hide_title')) {
+//                 $val = false;
+//             }
+//         }
+//         return $val;
+//     }
+// }
+// add_filter('hello_elementor_page_title', 'hello_elementor_check_hide_title');
 
 /**
  * Wrapper function to deal with backwards compatibility.
@@ -213,11 +231,13 @@ add_shortcode('basico', 'mostrar_basico');
 function mostrar_basico($atts)
 {
     global $current_user, $user_login;
-    //    add_filter('widget_text', 'apply_shortcodes');
+    wp_get_current_user();
+    add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
         return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
     } else {
-        if (apply_filters('wpml_current_language', null) == "es") {
+        $my_current_lang = apply_filters('wpml_current_language', null);
+        if ($my_current_lang == "es") {
             return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
                 . esc_html__("Start free", 'nodechartsfam') . '</p></div></a>';
         } else {
@@ -232,19 +252,24 @@ add_shortcode('principiantemensual', 'mostrar_principiante_mensual');
 function mostrar_principiante_mensual($atts)
 {
     global $current_user, $user_login;
-    // add_filter('widget_text', 'apply_shortcodes');
+    wp_get_current_user();
+    add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
-        $subscription = getactivesubscription2($current_user->ID);
-        if (
-            $subscription == "Principiante Mensual" || $subscription == "Principiante Anual" ||
-            $subscription == "Experto Mensual" || $subscription == "Experto Anual" || $subscription == "Profesional Anual"
-        ) {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
-        } else {
-            return '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" 
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $subscription = getactivesubscription2(get_current_user_id());
+            if (
+                $subscription == "Principiante Mensual" || $subscription == "Principiante Anual" ||
+                $subscription == "Experto Mensual" || $subscription == "Experto Anual" || $subscription == "Profesional Anual"
+            ) {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" 
                 data-product_id="356" data-product_sku="principiante-mensual" 
                 class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
                 <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            }
+        } else {
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
@@ -262,21 +287,27 @@ add_shortcode('principianteanual', 'mostrar_principiante_anual');
 function mostrar_principiante_anual($atts)
 {
     global $current_user, $user_login;
-    // add_filter('widget_text', 'apply_shortcodes');
+    wp_get_current_user();
+    add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
-        if (
-            in_array(
-                getactivesubscription2($current_user->ID),
-                ["Principiante Anual", "Experto Anual", "Profesional Anual"]
-            )
-        ) {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $user_id = get_current_user_id();
+            $subscription = getactivesubscription2($user_id);
+            if (
+                $subscription == "Principiante Anual" || $subscription == "Experto Anual"
+                || $subscription == "Profesional Anual"
+            ) {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<a rel="nofollow" href="?add-to-cart=358" data-quantity="1" data-product_id="358" data-product_sku="principiante-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>'
+                    . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            }
         } else {
-            return '<a rel="nofollow" href="?add-to-cart=358" data-quantity="1" data-product_id="358" data-product_sku="principiante-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>'
-                . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
     } else {
-        if (apply_filters('wpml_current_language', null) == "es") {
+        $my_current_lang = apply_filters('wpml_current_language', null);
+        if ($my_current_lang == "es") {
             return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
                 . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
         } else {
@@ -290,18 +321,23 @@ add_shortcode('expertomensual', 'mostrar_experto_mensual');
 function mostrar_experto_mensual($atts)
 {
     global $current_user, $user_login;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
+    wp_get_current_user();
+    add_filter('widget_text', 'apply_shortcodes');
 
     if ($user_login) {
-        $subscription = getactivesubscription2($current_user->ID);
-        if (
-            $subscription == "Experto Mensual" || $subscription == "Experto Anual"
-            || $subscription == "Profesional Anual"
-        ) {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $user_id = get_current_user_id();
+            $subscription = getactivesubscription2($user_id);
+            if (
+                $subscription == "Experto Mensual" || $subscription == "Experto Anual"
+                || $subscription == "Profesional Anual"
+            ) {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<a rel="nofollow" href="?add-to-cart=360" data-quantity="1" data-product_id="360" data-product_sku="experto-mensual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            }
         } else {
-            return '<a rel="nofollow" href="?add-to-cart=360" data-quantity="1" data-product_id="360" data-product_sku="experto-mensual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
@@ -319,17 +355,21 @@ add_shortcode('expertoanual', 'mostrar_experto_anual');
 function mostrar_experto_anual($atts)
 {
     global $current_user, $user_login;
-    // wp_get_current_user();
+    wp_get_current_user();
     add_filter('widget_text', 'apply_shortcodes');
 
     if ($user_login) {
-
-        $subscription = getactivesubscription2($current_user->ID);
-        if ($subscription == "Experto Anual" || $subscription == "Profesional Anual") {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $user_id = get_current_user_id();
+            $subscription = getactivesubscription2($user_id);
+            if ($subscription == "Experto Anual" || $subscription == "Profesional Anual") {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<a rel="nofollow" href="?add-to-cart=361" data-quantity="1" data-product_id="361" data-product_sku="experto-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>'
+                    . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            }
         } else {
-            return '<a rel="nofollow" href="?add-to-cart=361" data-quantity="1" data-product_id="361" data-product_sku="experto-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>'
-                . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
@@ -347,15 +387,19 @@ add_shortcode('profesionalmensual', 'mostrar_profesional_mensual');
 function mostrar_profesional_mensual($atts)
 {
     global $current_user, $user_login;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
+    add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
-        $subscription = getactivesubscription2($current_user->ID);
-        if ($subscription == "Profesional Mensual") {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $user_id = get_current_user_id();
+            $subscription = getactivesubscription2($user_id);
+            if ($subscription == "Profesional Mensual") {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<div class="boton disable"><p style="color: gray!important;">'
+                    . esc_html__("Buy!", 'nodechartsfam') . '</p></div>';
+            }
         } else {
-            return '<div class="boton disable"><p style="color: gray!important;">'
-                . esc_html__("Buy!", 'nodechartsfam') . '</p></div>';
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
@@ -372,15 +416,20 @@ add_shortcode('profesionalanual', 'mostrar_profesional_anual');
 function mostrar_profesional_anual($atts)
 {
     global $current_user, $user_login;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
+    wp_get_current_user();
+    add_filter('widget_text', 'apply_shortcodes');
     if ($user_login) {
-        if (getactivesubscription2($current_user->ID) == "Profesional Anual") {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+        if (is_plugin_active('woocommerce-subscriptions/woocommerce-subscriptions.php')) {
+            $user_id = get_current_user_id();
+            $subscription = getactivesubscription2($user_id);
+            if ($subscription == "Profesional Anual") {
+                return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
+            } else {
+                return '<a rel="nofollow" href="?add-to-cart=362" data-quantity="1" data-product_id="362" data-product_sku="profesional-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            }
         } else {
-            return '<a rel="nofollow" href="?add-to-cart=362" data-quantity="1" data-product_id="362" data-product_sku="profesional-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            return '<p style="color:red;">Woocommerce Subscription no encontrado</p>';
         }
-
     } else {
         $my_current_lang = apply_filters('wpml_current_language', null);
         if ($my_current_lang == "es") {
@@ -395,22 +444,27 @@ function mostrar_profesional_anual($atts)
 
 function getactivesubscription2($userId)
 {
-    $nombremembresia = get_transient('getActiveSubs' . $userId);
-    if (!$nombremembresia) {
-        $subscriptions = wcs_get_users_subscriptions($userId);
-        $nombremembresia = "no";
-        foreach ($subscriptions as $subscr) {
-            if ($subscr->has_status(array('active', 'pending-cancel'))) {
-                $items = wcs_get_subscription($subscr->get_id())->get_items();
-                foreach ($items as $item) {
-                    $product = $item->get_product();
-                    $nombremembresia = $product->get_name();
-                }
-            }
+    $user_subscriptions = wcs_get_users_subscriptions($userId);
+    $arrayidsubscription = array();
+    $arrayproductosid = array();
+    $arrayproductosnombre = array();
+    $nombremembresia = "no";
+    foreach ($user_subscriptions as $subscription) {
+        if ($subscription->has_status(array('active', 'pending-cancel'))) {
+            $id_subscription = $subscription->get_id();
+            array_push($arrayidsubscription, $id_subscription);
         }
-        set_transient('getActiveSubscription' . $userId, $nombremembresia, 60);
-        // die(var_dump($nombremembresia));
     }
+
+    foreach ($arrayidsubscription as $idsus) {
+        $wc_subscription = wcs_get_subscription($idsus);
+        $items = $wc_subscription->get_items();
+        foreach ($items as $item) {
+            $product = $item->get_product();
+            $nombremembresia = $product->get_name();
+        }
+    }
+
     return $nombremembresia;
 }
 
@@ -442,22 +496,10 @@ function custom_url_forward()
 }
 
 
+
 add_action('wp_footer', 'woocommerce_show_coupon', 99);
 function woocommerce_show_coupon()
 {
     echo '<script type="text/javascript">jQuery(document).ready(function($) {
 $(\'.checkout_coupon\').show();});</script>';
 }
-
-
-/**
- * Avoid disabling webhooks when they fail
- *
- * @param [type] $number
- * @return void
- */
-function overrule_webhook_disable_limit($number)
-{
-    return 999999999999; //very high number hopefully you'll never reach.
-}
-add_filter('woocommerce_max_webhook_delivery_failures', 'overrule_webhook_disable_limit');
