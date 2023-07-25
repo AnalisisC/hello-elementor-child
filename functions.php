@@ -464,7 +464,7 @@ function getactivesubscription2($userId)
 }
 
 /**
- * URL redirect after user logout
+ * URL redirect after user logout -- aleixtuset
  */
 add_action('wp_logout', 'ps_redirect_after_logout');
 function ps_redirect_after_logout()
@@ -474,21 +474,22 @@ function ps_redirect_after_logout()
     exit();
 }
 
-//NOMBRE DEL USUARIO EN EL MENU
-add_filter('wp_nav_menu_objects', 'set_navigation_user_name');
-function set_navigation_user_name($menu_items)
-{
-    foreach ($menu_items as $menu_item) {
-        if ('{user_name}' === $menu_item->title) {
-            //Get user and his name
-            $current_user   = wp_get_current_user();
-            $user_firstname = $current_user->user_firstname;
-            $user_lastname  = $current_user->user_lastname;
-            $menu_item->title = $user_firstname . ' ' . $user_lastname;
-        }
-    }
-    return $menu_items;
+/**
+ * URL redirect lost-password to custom page -- aleixtuset
+ */
+add_action( 'template_redirect', 'custom_url_forward' );
+function custom_url_forward() {
+	if ( $_SERVER['REQUEST_URI'] == '/mi-cuenta/lost-password/' ) {
+		wp_redirect( "/restablecer-contrasena/" );	
+		exit();
+	}
+	if ( $_SERVER['REQUEST_URI'] == '/en/my-account/lost-password/' ) {
+		wp_redirect( "/en/reset-password/" );
+		exit();
+	}
 }
+
+
 
 add_action('wp_footer', 'woocommerce_show_coupon', 99);
 function woocommerce_show_coupon()
@@ -498,142 +499,3 @@ $(\'.checkout_coupon\').show();});</script>';
 }
 
 
-/**
- * Replaces url when clicking on logo
- * @author Miguel Gil  <miguelgilmartinez@gmail.com>
- * @return void
- */
-function nodecharts_custom_login_url()
-{
-    return home_url();
-}
-add_filter('login_headerurl', 'nodecharts_custom_login_url');
-
-/**
- * @author Miguel Gil  <miguelgilmartinez@gmail.com>
- * @return void
- */
-function nodecharts_login_logo_url_redirect()
-{
-    return home_url();
-}
-add_filter('login_headertitle', 'nodecharts_login_logo_url_redirect');
-
-/**
- * Disable language dropdown in login screen. Do not work. Use WPML config
- * @author Miguel Gil  <miguelgilmartinez@gmail.com>
- */
-add_filter('login_display_language_dropdown', '__return_false');
-
-
-
-// ENABLE THIS IF YOU WANT TO ADD LINK TO FORGOT PASSWORD
-//add_action('login_form_middle', 'add_lost_password_link');
-// function add_lost_password_link()
-// {
-//     return '<a href="/wp-login.php?action=lostpassword">Forgot Your Password?</a>';
-// }
-
-
-/**
- * Login Error Handling
- * @author Miguel Gil  <miguelgilmartinez@gmail.com>
- * @return void
- */
-
-add_filter('wp_login_failed', function () {
-    wp_redirect(apply_filters('wpml_current_language', null) == 'en'
-    ? '/en/sign-in?error=1' : '/iniciar-sesion?error=1');
-    exit(); //Fuckin' spaguetti code
-});
-
-function nodecharts_login_page()
-{
-    if (!is_user_logged_in()) {
-        if (isset($_REQUEST['error'])) {
-            echo(apply_filters('wpml_current_language', null) == 'en' ?
-            '<div class="error-login">Error user or password</div>' :
-            '<div class="error-login">Error en usuario o contraseña</div>');
-        }
-        $args = array(
-          'echo'           => true,
-          'remember'       => true,
-          'redirect'       => home_url((apply_filters('wpml_current_language', null) == 'en'
-          ? '/en/studio' : '/estudio')),
-          'form_id'        => 'loginform',
-          'id_username'    => 'user_login',
-          'id_password'    => 'user_pass',
-          'id_remember'    => 'rememberme',
-          'id_submit'      => 'wp-submit',
-          'label_username' => __(''),
-          'label_password' => __(''),
-          'label_remember' => __('Remember Me'),
-          'label_log_in'   => __('Log In'),
-          'value_remember' => false
-        );
-        wp_login_form($args);
-        wp_enqueue_script(
-            'jslogin',
-            str_contains($_SERVER["HTTP_HOST"], 'nodecharts.com') ?
-            'https://nodecharts-frontend.s3.eu-west-1.amazonaws.com/wp-content/themes/hello-elementor/assets/js/login.js' :
-            get_template_directory_uri() .'/assets/js/login.js',
-            array('jquery'),
-            '1.0',
-            true
-        );
-    } elseif(!isset($_GET['action'])) { //Edit with elementor
-        // Miguel: Redirections won't work here because header was already sent. ob_clean... neither works
-        echo '<style>div[class*="elementor-"] h3 {margin-top: 200px;} .wp-image-2346{display:none !important}</style><div style="color:rgb(0, 102, 255); text-align: center; margin-top: 50px;" class="elementor-element elementor-widget elementor-widget-text-editor" data-element_type="widget" data-widget_type="text-editor.default">';
-        if (apply_filters('wpml_current_language', null) == 'en') {
-            echo '<div class="elementor-widget-container"><h3>User authenticated. Redirecting...</h3></div></div>';
-            echo '<script>window.location.href="/estudio"</script>';
-        } else {
-            echo '<div class="elementor-widget-container"><h3>Usuario autenticado. Redirigiendo...</h3></div></div>';
-            echo '<script>jQuery("h3:contains(Inicia sesión)").hide();window.location.href="/estudio"</script>';
-        }
-        exit();
-    }
-}
-add_shortcode('nodecharts-login-page', 'nodecharts_login_page');
-
-function redirect_login_page()
-{
-    $url = basename($_SERVER['REQUEST_URI']); // get requested URL
-    isset($_REQUEST['redirect_to']) ? ($url = "wp-login.php") : null; // if users send request to wp-admin
-    if($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['customer-logout'])) {
-        wp_logout();
-        $url = apply_filters('wpml_current_language', null) == 'en'
-        ? '/en/sign-in' : '/iniciar-sesion';
-        wp_redirect(home_url($url));
-        exit;
-    }
-
-    // Avoid infinite redirection when user is not logged in
-    if ($url == "wp-login.php" && $_SERVER['REQUEST_METHOD'] && isset($_GET['redirect_to'])) {
-        wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
-        ? '/en/sign-in' : '/iniciar-sesion'));
-        exit;
-    }
-
-    if ($url  == "wp-login.php" && isset($_POST['log'], $_POST['pwd'])) {
-        $user = wp_authenticate($_POST['log'], $_POST['pwd']);
-        if (!is_wp_error($user)) {
-            wp_set_current_user($user->ID);
-            $redirect = apply_filters('wpml_current_language', null) == 'en'
-            ? '/en/studio' : '/estudio';
-            wp_redirect(home_url($redirect));
-        } else {
-            wp_redirect(home_url(apply_filters('wpml_current_language', null) == 'en'
-            ? '/en/sign-in' : '/iniciar-sesion'));
-        }
-    }
-
-    if ($url == "wp-login.php" && $_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['loginSocial'])) {
-        $redirect = apply_filters('wpml_current_language', null) == 'en'
-            ? '/en/studio' : '/estudio';
-        wp_redirect(home_url($redirect));
-    }
-
-    // do not add this without checkin admin is on wp_redirect(home_url('/iniciar-sesion'));
-}
-add_action('init', 'redirect_login_page');
