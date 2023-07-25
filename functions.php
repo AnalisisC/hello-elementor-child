@@ -499,3 +499,14 @@ $(\'.checkout_coupon\').show();});</script>';
 }
 
 
+/**
+ * Avoid disabling webhooks when they fail
+ *
+ * @param [type] $number
+ * @return void
+ */
+function overrule_webhook_disable_limit($number)
+{
+    return 999999999999; //very high number hopefully you'll never reach.
+}
+add_filter('woocommerce_max_webhook_delivery_failures', 'overrule_webhook_disable_limit');
