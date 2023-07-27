@@ -463,3 +463,29 @@ function overrule_webhook_disable_limit($number)
     return 999999999999; //very high number hopefully you'll never reach.
 }
 add_filter('woocommerce_max_webhook_delivery_failures', 'overrule_webhook_disable_limit');
+
+/**
+ * If webhook fails, it enqueues again for a new retry
+ *
+ * @param [array] $http_args
+ * @param [array] $response
+ * @param [unknown] $duration
+ * @param [int] $arg
+ * @param [int] $id
+ * @return void
+ */
+function woocommerce_webhook_listener_custom($http_args, $response, $duration, $arg, $id)
+{
+
+    $responseCode = wp_remote_retrieve_response_code($response);
+    if ($responseCode != 200) {
+        // re-queue web-hook for another attempt, retry every 5 minutes until success
+        $timestamp = new DateTime('+3 minutes');
+        $argsArray = array('webhook_id' => $id, 'arg' => $arg);
+        WC()->queue()->schedule_single($timestamp, 'woocommerce_deliver_webhook_async', $args = $argsArray, $group = 'woocommerce-webhooks');
+        error_log("Retrying webhook delivery for ID " . $id . " with arg $arg -  " .
+            json_encode($http_args) . PHP_EOL . '  Response:' . json_encode($response));
+    }
+}
+
+add_action('woocommerce_webhook_delivery', 'woocommerce_webhook_listener_custom', 10, 5);
