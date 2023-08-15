@@ -497,31 +497,46 @@ function enqueue_react_script()
 }
 add_action('wp_enqueue_scripts', 'enqueue_react_script');
 
-function custom_api_get_translation_links($data)
+function custom_api_get_translation_links($request)
 {
-    $translations = array();
-    return ['ok' => true, 'translations' => 'hola'];
-    foreach (wpml_get_active_languages() as $lang) {
-        $post_id_in_language = icl_object_id($data['id'], 'post', false, $lang['language_code']);
-        if ($post_id_in_language) {
-            $translations[$lang['language_code']] = array(
-                'id' => $post_id_in_language,
-                'url' => get_permalink($post_id_in_language)
-            );
+    $trans = '';
+    $lang = $request->get_param('lang');
+    $page = get_page_by_path($request->get_param('slug'));
+    if ($page) {
+        $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
+        if ($trid) {
+            $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
+            $trans = $trans[$lang];
         }
     }
-
-    return $translations;
+    return $trans;
 }
 
+/**
+ * @return string Page slug in other language
+ */
 function register_translation_links_endpoint()
 {
     register_rest_route(
         'nodecharts-api',
-        '/translation-links/(?P<id>\d+)',
+        '/translation-links',
         array(
-            'methods' => 'GET',
+            'methods' => 'POST',
             'callback' => 'custom_api_get_translation_links',
+            'args' => array(
+                'slug' => array(
+                    'required' => true,
+                    'validate_callback' => function ($param, $request, $key) {
+                        return is_string($param);
+                    },
+                ),
+                'lang' => array(
+                    'required' => true,
+                    'validate_callback' => function ($param, $request, $key) {
+                        return in_array($param, ['en', 'es']);
+                    },
+                ),
+            )
         )
     );
 }
