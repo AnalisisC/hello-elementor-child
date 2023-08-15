@@ -489,3 +489,40 @@ function woocommerce_webhook_listener_custom($http_args, $response, $duration, $
 }
 
 add_action('woocommerce_webhook_delivery', 'woocommerce_webhook_listener_custom', 10, 5);
+
+
+function enqueue_react_script()
+{
+    wp_enqueue_script('react-bundle', '/wp-content/dist/bundle.js', array(), '1.0.0', true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_react_script');
+
+function custom_api_get_translation_links($data)
+{
+    $translations = array();
+    return ['ok' => true, 'translations' => 'hola'];
+    foreach (wpml_get_active_languages() as $lang) {
+        $post_id_in_language = icl_object_id($data['id'], 'post', false, $lang['language_code']);
+        if ($post_id_in_language) {
+            $translations[$lang['language_code']] = array(
+                'id' => $post_id_in_language,
+                'url' => get_permalink($post_id_in_language)
+            );
+        }
+    }
+
+    return $translations;
+}
+
+function register_translation_links_endpoint()
+{
+    register_rest_route(
+        'nodecharts-api',
+        '/translation-links/(?P<id>\d+)',
+        array(
+            'methods' => 'GET',
+            'callback' => 'custom_api_get_translation_links',
+        )
+    );
+}
+add_action('rest_api_init', 'register_translation_links_endpoint');
