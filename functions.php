@@ -557,6 +557,7 @@ add_action('rest_api_init', 'register_translation_links_endpoint');
 function getUserMenuData($request)
 {
     // $values = get_transient('usermenu' . $request['cookie']);
+    die("POR AQUI. DETECTAR BIEN EL JWT");
     $values['usuario'] = get_user_by('hash', $request['jwt']);
     $values['jwt'] = $request['jwt'];
 
