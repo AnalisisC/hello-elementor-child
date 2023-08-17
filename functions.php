@@ -394,6 +394,18 @@ function mostrar_profesional_anual()
     }
 }
 
+function nodecharts_jwt()
+{
+    $current_user = wp_get_current_user(); // Obtiene el usuario actualmente autenticado
+    if ($current_user instanceof WP_User) {
+        $user_hash = get_user_meta($current_user->ID, 'hash', true);
+        if ($user_hash)
+            echo '<script>window.jwt="' . $user_hash . '"</script>';
+    }
+
+}
+add_shortcode('nodecharts_jwt', 'nodecharts_jwt');
+
 function getactivesubscription2(int $userId)
 {
     $nombremembresia = get_transient('getActiveSubs' . $userId);
@@ -502,14 +514,12 @@ function custom_api_get_translation_links($request)
     $trans = '';
     $lang = $request->get_param('lang');
     $page = get_page_by_path($request->get_param('slug'));
-    if ($page) {
-        $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
-        if ($trid) {
-            $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
-            $trans = $trans[$lang];
-        }
+    $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
+    if ($trid) {
+        $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
+        $trans = ($lang == 'en' ? '/en/' : '/') . get_post($trans[$lang]->element_id)->post_name;
     }
-    return $trans;
+    return ['page_slug' => $trans];
 }
 
 /**
@@ -541,3 +551,59 @@ function register_translation_links_endpoint()
     );
 }
 add_action('rest_api_init', 'register_translation_links_endpoint');
+
+
+
+function getUserMenuData($request)
+{
+    // $values = get_transient('usermenu' . $request['cookie']);
+    $values['usuario'] = get_user_by('hash', $request['jwt']);
+    $values['jwt'] = $request['jwt'];
+
+    //  if (!$values) {
+    $values['page_slug'] = custom_api_get_translation_links($request)['page_slug'];
+    $values['cookie'] = wp_validate_auth_cookie($request['cookie'], 'auth');
+    $values['cookie2'] = $request['cookie'];
+    $values['lang'] = $request['lang'];
+    set_transient('usermenu' . $request['cookie'], $values, 1);
+    //   }
+    return $values;
+}
+
+
+/**
+ * REST API for User Menu
+ * @return void
+ */
+function usermenu()
+{
+    register_rest_route(
+        'nodecharts-api',
+        '/usermenu',
+        array(
+            'methods' => 'POST',
+            'callback' => 'getUserMenuData',
+            'args' => array(
+                'slug' => array(
+                    'required' => true,
+                    'validate_callback' => function ($param, $request, $key) {
+                        return is_string($param);
+                    },
+                ),
+                'lang' => array(
+                    'required' => true,
+                    'validate_callback' => function ($param, $request, $key) {
+                        return in_array($param, ['en', 'es']);
+                    },
+                ),
+                'cookie' => array(
+                    'required' => true,
+                    'validate_callback' => function ($param, $request, $key) {
+                        return is_string($param);
+                    }
+                )
+            )
+        )
+    );
+}
+add_action('rest_api_init', 'usermenu');
