@@ -556,21 +556,28 @@ add_action('rest_api_init', 'register_translation_links_endpoint');
 
 function getUserMenuData($request)
 {
-    // $values = get_transient('usermenu' . $request['cookie']);
-    die("POR AQUI. DETECTAR BIEN EL JWT");
-    $values['usuario'] = get_user_by('hash', $request['jwt']);
-    $values['jwt'] = $request['jwt'];
-
-    //  if (!$values) {
-    $values['page_slug'] = custom_api_get_translation_links($request)['page_slug'];
-    $values['cookie'] = wp_validate_auth_cookie($request['cookie'], 'auth');
-    $values['cookie2'] = $request['cookie'];
-    $values['lang'] = $request['lang'];
-    set_transient('usermenu' . $request['cookie'], $values, 1);
-    //   }
+    $values = get_transient('usermenu' . $request['jwt']);
+    if (!$values) {
+        $args = array(
+            'meta_key' => 'hash',
+            'meta_value' => $request['jwt'],
+            'meta_compare' => '=',
+            'number' => 1
+        );
+        $user = get_users($args);
+        if ($user) {
+            $values['page_slug'] = custom_api_get_translation_links($request)['page_slug'];
+            $values['lang'] = $request['lang'];
+            $values['user']['ID'] = $user[0]->ID;
+            $values['user']['display_name'] = $user[0]->display_name;
+            $values['user']['user_email'] = $user[0]->user_email;
+            set_transient('usermenu' . $request['jwt'], $values, 1);
+        } else {
+            throw new Exception('Invalid JWT ' . $request['jwt'], 400);
+        }
+    }
     return $values;
 }
-
 
 /**
  * REST API for User Menu
@@ -597,10 +604,10 @@ function usermenu()
                         return in_array($param, ['en', 'es']);
                     },
                 ),
-                'cookie' => array(
+                'jwt' => array(
                     'required' => true,
                     'validate_callback' => function ($param, $request, $key) {
-                        return is_string($param);
+                        return true;
                     }
                 )
             )
