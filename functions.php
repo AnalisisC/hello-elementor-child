@@ -509,7 +509,7 @@ function enqueue_react_script()
 }
 add_action('wp_enqueue_scripts', 'enqueue_react_script');
 
-function custom_api_get_translation_links($request)
+function custom_api_get_translation_links($request): array
 {
     $trans = '';
     $lang = $request->get_param('lang');
@@ -554,29 +554,34 @@ add_action('rest_api_init', 'register_translation_links_endpoint');
 
 
 
-function getUserMenuData($request)
+function getUserMenuData($req)
 {
-    $values = get_transient('usermenu' . $request['jwt']);
-    if (!$values) {
-        $args = array(
+    $vals = get_transient('usermenu_' . $req['lang'] . '_' . $req['jwt']);
+    if (!$vals) {
+        $user = get_users([
             'meta_key' => 'hash',
-            'meta_value' => $request['jwt'],
+            'meta_value' => $req['jwt'],
             'meta_compare' => '=',
             'number' => 1
-        );
-        $user = get_users($args);
+        ]);
         if ($user) {
-            $values['page_slug'] = custom_api_get_translation_links($request)['page_slug'];
-            $values['lang'] = $request['lang'];
-            $values['user']['ID'] = $user[0]->ID;
-            $values['user']['display_name'] = $user[0]->display_name;
-            $values['user']['user_email'] = $user[0]->user_email;
-            set_transient('usermenu' . $request['jwt'], $values, 1);
+            $vals['page_slug'] = custom_api_get_translation_links($req)['page_slug'];
+            $vals['lang'] = $req['lang'];
+            $vals['user']['ID'] = $user[0]->ID;
+            $vals['user']['display_name'] = $user[0]->display_name;
+            $vals['user']['user_email'] = $user[0]->user_email;
+            foreach ($user[0]->roles as $rol) {
+                if ($rol == 'affiliate') {
+                    $vals['user']['affiliate'] = true;
+                    break;
+                }
+            }
+            set_transient('usermenu_' . $req['lang'] . '_' . $req['jwt'], $vals, 600);
         } else {
-            throw new Exception('Invalid JWT ' . $request['jwt'], 400);
+            throw new Exception('Invalid JWT ' . $req['jwt'], 400);
         }
     }
-    return $values;
+    return $vals;
 }
 
 /**
@@ -607,7 +612,7 @@ function usermenu()
                 'jwt' => array(
                     'required' => true,
                     'validate_callback' => function ($param, $request, $key) {
-                        return true;
+                        return is_string($param);
                     }
                 )
             )
