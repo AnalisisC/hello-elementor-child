@@ -212,6 +212,20 @@ if (!function_exists('hello_elementor_body_open')) {
 }
 
 /**
+ * Sortcode [only_logged_in_users] to redirect non-logged in users to login
+ * @return void
+ */
+function only_logged_in_users_shortcode()
+{
+    if (!is_user_logged_in()) {
+        $slug = apply_filters('wpml_current_language', null) == "es" ? '/login' : '/en/sign-in';
+        echo '<script>window.location.href = "' . get_site_url() . $slug . '";</script>';
+        die();
+    }
+}
+add_shortcode('only_logged_in_users', 'only_logged_in_users_shortcode');
+
+/**
  * SHORTCODE PARA MOSTRAR BOTÓN REGISTRO/ACCEDER EN PRECIOS
  */
 add_shortcode('basico', 'mostrar_basico');
