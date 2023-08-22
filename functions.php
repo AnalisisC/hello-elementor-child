@@ -523,21 +523,26 @@ function enqueue_react_script()
 }
 add_action('wp_enqueue_scripts', 'enqueue_react_script');
 
-function custom_api_get_translation_links($request): array
+function custom_api_get_translation_links($req): array
 {
     $trans = '';
-    $lang = $request->get_param('lang');
-    $page = get_page_by_path($request->get_param('slug'));
-    $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
-    if ($trid) {
-        $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
-        $trans = ($lang == 'en' ? '/en/' : '/') . get_post($trans[$lang]->element_id)->post_name;
+    $lang = $req->get_param('lang'); // What lang to translate to
+    $slug = $req->get_param('slug');
+    if (!empty($slug)) {
+        $page = get_page_by_path($slug);
+        $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
+        if ($trid) {
+            $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
+            $trans = ($lang == 'en' ? '/en/' : '/') . get_post($trans[$lang]->element_id)->post_name;
+        }
+    } else {
+        $trans = ($lang == 'en' ? '/en/' : '/');
     }
     return ['page_slug' => $trans];
 }
 
 /**
- * @return string Page slug in other language
+ * @return string Page slug in other language set by lang param
  */
 function register_translation_links_endpoint()
 {
@@ -567,10 +572,10 @@ function register_translation_links_endpoint()
 add_action('rest_api_init', 'register_translation_links_endpoint');
 
 
-
 function getUserMenuData($req)
 {
-    $vals = get_transient('usermenu_' . $req['lang'] . '_' . $req['jwt']);
+    error_log($req['jwt'] . '/n' . $req['slug'] . '/n' . $req['lang']);
+    $vals = get_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']));
     if (!$vals) {
         $user = get_users([
             'meta_key' => 'hash',
@@ -590,7 +595,8 @@ function getUserMenuData($req)
                     break;
                 }
             }
-            set_transient('usermenu_' . $req['lang'] . '_' . $req['jwt'], $vals, 600);
+            error_log(json_encode($vals));
+            //         set_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']), $vals, 600);
         } else {
             throw new Exception('Invalid JWT ' . $req['jwt'], 400);
         }
