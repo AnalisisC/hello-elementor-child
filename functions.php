@@ -574,9 +574,7 @@ add_action('rest_api_init', 'register_translation_links_endpoint');
 
 function getUserMenuData($req)
 {
-    error_log($req['jwt'] . '/n' . $req['slug'] . '/n' . $req['lang']);
-    //$vals = get_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']));
-    $vals = null;
+    $vals = get_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']));
     if (!$vals) {
         $user = get_users([
             'meta_key' => 'hash',
@@ -596,8 +594,7 @@ function getUserMenuData($req)
                     break;
                 }
             }
-            error_log(json_encode($vals));
-            //         set_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']), $vals, 600);
+            set_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']), $vals, 600);
         } else {
             throw new Exception('Invalid JWT ' . $req['jwt'], 400);
         }
