@@ -575,7 +575,8 @@ add_action('rest_api_init', 'register_translation_links_endpoint');
 function getUserMenuData($req)
 {
     error_log($req['jwt'] . '/n' . $req['slug'] . '/n' . $req['lang']);
-    $vals = get_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']));
+    //$vals = get_transient('usermenu_' . hash('sha256', $req['jwt'] . '_' . $req['slug'] . '_' . $req['lang']));
+    $vals = null;
     if (!$vals) {
         $user = get_users([
             'meta_key' => 'hash',
