@@ -517,11 +517,11 @@ function woocommerce_webhook_listener_custom($http_args, $response, $duration, $
 add_action('woocommerce_webhook_delivery', 'woocommerce_webhook_listener_custom', 10, 5);
 
 
-function enqueue_react_script()
-{
-    wp_enqueue_script('react-bundle', '/wp-content/dist/bundle.js', array(), '1.0.0', true);
-}
-add_action('wp_enqueue_scripts', 'enqueue_react_script');
+// function enqueue_react_script()
+// {
+//     wp_enqueue_script('react-bundle', '/wp-content/dist/bundle.js', array(), '1.0.0', true);
+// }
+// add_action('wp_enqueue_scripts', 'enqueue_react_script');
 
 function custom_api_get_translation_links($req): array
 {
