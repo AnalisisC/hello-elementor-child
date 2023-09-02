@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Theme functions and definitions
  * @package HelloElementor
@@ -266,8 +267,7 @@ function mostrar_principiante_mensual()
                 <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
-        $my_current_lang = apply_filters('wpml_current_language', null);
-        if ($my_current_lang == "es") {
+        if (apply_filters('wpml_current_language', null) == "es") {
             return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>' .
                 esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
         } else {
@@ -281,7 +281,6 @@ add_shortcode('principianteanual', 'mostrar_principiante_anual');
 function mostrar_principiante_anual()
 {
     global $current_user;
-    // add_filter('widget_text', 'apply_shortcodes');
     if ($current_user->ID) {
         if (
             in_array(
@@ -309,9 +308,6 @@ add_shortcode('expertomensual', 'mostrar_experto_mensual');
 function mostrar_experto_mensual()
 {
     global $current_user;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
-
     if ($current_user->ID) {
         $subscription = getactivesubscription2($current_user->ID);
         if (
@@ -416,7 +412,6 @@ function nodecharts_jwt()
         if ($user_hash)
             echo '<script>window.jwt="' . $user_hash . '"</script>';
     }
-
 }
 add_shortcode('nodecharts_jwt', 'nodecharts_jwt');
 
