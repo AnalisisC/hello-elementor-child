@@ -386,22 +386,29 @@ function mostrar_profesional_anual()
     global $current_user;
     // wp_get_current_user();
     // add_filter('widget_text', 'apply_shortcodes');
-    if ($current_user->ID) {
-        if (getactivesubscription2($current_user->ID) == "Profesional Anual") {
-            return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') . '</b></p></div>';
-        } else {
-            return '<a rel="nofollow" href="?add-to-cart=362" data-quantity="1" data-product_id="362" data-product_sku="profesional-anual" class="button product_type_simple add_to_cart_button ajax_add_to_cart added"><div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
-        }
+    if (
+        $current_user->ID &&
+        getactivesubscription2($current_user->ID) == "Profesional Anual"
+    ) {
+        return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
+            '</b></p></div>';
     } else {
-        $my_current_lang = apply_filters('wpml_current_language', null);
-        if ($my_current_lang == "es") {
-            return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
-                . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
-        } else {
-            return '<a class="link-pricing" href="https://nodecharts.com/en/sign-up"><div class="boton"><p>'
-                . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
-        }
+        return '<a rel="nofollow" href="?add-to-cart=362" data-quantity="1" 
+        data-product_id="362" data-product_sku="profesional-anual" 
+        class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
+        <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') .
+            '</p></div></a>';
     }
+    // } else {
+    //     $my_current_lang = apply_filters('wpml_current_language', null);
+    //     if ($my_current_lang == "es") {
+    //         return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
+    //             . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
+    //     } else {
+    //         return '<a class="link-pricing" href="https://nodecharts.com/en/sign-up"><div class="boton"><p>'
+    //             . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
+    //     }
+    // }
 }
 
 function nodecharts_jwt()
