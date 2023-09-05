@@ -623,3 +623,36 @@ li {
   vertical-align: baseline;
   background: transparent;
 }
+
+
+.added_to_cart {
+  display: none !important;
+}
+
+.boton a:hover {
+  color: white !important;
+}
+
+.boton {
+  border-radius: 5px !important;
+  text-align: center;
+  border: 1px solid;
+  border-radius: 0px;
+  padding: 9px !important;
+  font-size: 15px;
+  transition: all .3s;
+}
+
+.boton p {
+  margin: 0px !important;
+}
+
+.boton:hover {
+  border: 1px solid #0066ff;
+  background-color: #0066FF;
+  color: white !important;
+}
+
+.boton p:hover {
+  color: white !important;
+}

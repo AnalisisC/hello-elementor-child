@@ -265,7 +265,7 @@ function mostrar_principiante_mensual()
                 data-product_id="356" data-product_sku="principiante-mensual" 
                 class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
                 <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
-    } 
+    }
     // } else {
     //     if (apply_filters('wpml_current_language', null) == "es") {
     //         return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>' .
