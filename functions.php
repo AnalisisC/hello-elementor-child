@@ -632,9 +632,11 @@ add_action('rest_api_init', 'usermenu');
 
 function delete_usercache($req)
 {
-    $username = $req->get_params()['billing']['email'];
-    if (checkWebhookSignature(
-        $req->get_header('X-WC-Webhook-Signature'),
+    $params = $req->get_params();
+    $username = $params['billing']['email'] ?? null;
+    $x_wc_webhook_signature = $req->get_header('X-WC-Webhook-Signature');
+    if ($username && checkWebhookSignature(
+        $x_wc_webhook_signature,
         $req->get_body()
     )) {
         $path = WP_CONTENT_DIR . '/cache/wp-rocket/' .
