@@ -554,7 +554,8 @@ function register_translation_links_endpoint()
                         return in_array($param, ['en', 'es']);
                     },
                 ),
-            )
+            ),
+            'permission_callback' => true
         )
     );
 }
@@ -622,8 +623,74 @@ function usermenu()
                         return is_string($param);
                     }
                 )
-            )
+            ),
+            'permission_callback' => true
         )
     );
 }
 add_action('rest_api_init', 'usermenu');
+
+function delete_usercache($req)
+{
+    $username = $req->get_params()['billing']['email'];
+    if (checkWebhookSignature($req->get_header('X-WC-Webhook-Signature'), $req->get_body())) {
+        $path = WP_CONTENT_DIR . '/cache/wp-rocket/' . parse_url(site_url(), PHP_URL_HOST) . '-' . urlencode($username) . '-';
+        if (file_exists($path)) {
+            deleteDirRecursively($path);
+            wp_send_json_success(array('message' => "OK [$path] removed."));
+        } else {
+            wp_send_json_error(array('message' => "KO [$path] not found."));
+        }
+    }
+}
+
+function register_api_clear_usercache()
+{
+    register_rest_route('nodecharts-api', '/deleteusercache/', array(
+        'methods' => 'POST',
+        'callback' => 'delete_usercache',
+        'permission_callback' => function () {
+            return true; //No need to check permissions. 
+            //return current_user_can('manage_options');
+        },
+    ));
+}
+
+add_action('rest_api_init', 'register_api_clear_usercache');
+
+function deleteDirRecursively($dir)
+{
+    if (is_dir($dir)) {
+        $files = scandir($dir);
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                $path = $dir . '/' . $file;
+                if (is_dir($path)) {
+                    deleteDirRecursively($path); // Recursive call to delete subdirectories
+                } else {
+                    unlink($path); // Delete files
+                }
+            }
+        }
+        rmdir($dir); // Delete the current directory
+    }
+}
+
+
+/**
+ * Checks webhook signature. 
+ *
+ * @param string $x_wc_webhook_signature
+ * @param string $body
+ * @return boolean True is signature is ok
+ */
+function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bool
+{
+    return $x_wc_webhook_signature ==
+        base64_encode(hash_hmac(
+            'sha256',
+            $body,
+            WOOCOMMERCE_WEBHOOK_SECRET,
+            true
+        ));
+}
