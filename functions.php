@@ -554,8 +554,7 @@ function register_translation_links_endpoint()
                         return in_array($param, ['en', 'es']);
                     },
                 ),
-            ),
-            'permission_callback' => true
+            )
         )
     );
 }
