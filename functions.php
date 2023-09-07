@@ -633,8 +633,13 @@ add_action('rest_api_init', 'usermenu');
 function delete_usercache($req)
 {
     $username = $req->get_params()['billing']['email'];
-    if (checkWebhookSignature($req->get_header('X-WC-Webhook-Signature'), $req->get_body())) {
-        $path = WP_CONTENT_DIR . '/cache/wp-rocket/' . parse_url(site_url(), PHP_URL_HOST) . '-' . urlencode($username) . '-';
+    if (checkWebhookSignature(
+        $req->get_header('X-WC-Webhook-Signature'),
+        $req->get_body()
+    )) {
+        $path = WP_CONTENT_DIR . '/cache/wp-rocket/' .
+            parse_url(site_url(), PHP_URL_HOST) . '-' .
+            urlencode($username) . '-';
         if (file_exists($path)) {
             deleteDirRecursively($path);
             wp_send_json_success(array('message' => "OK [$path] removed."));
@@ -650,7 +655,7 @@ function register_api_clear_usercache()
         'methods' => 'POST',
         'callback' => 'delete_usercache',
         'permission_callback' => function () {
-            return true; //No need to check permissions. 
+            return true; //No need to check permissions: Webhook Signature is checked
             //return current_user_can('manage_options');
         },
     ));
