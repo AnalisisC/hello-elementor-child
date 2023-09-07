@@ -555,7 +555,9 @@ function register_translation_links_endpoint()
                     },
                 ),
             ),
-            'permission_callback' => true
+            'permission_callback' => function () {
+                return true;
+            }
         )
     );
 }
@@ -623,7 +625,10 @@ function usermenu()
                         return is_string($param);
                     }
                 )
-            )
+            ), 'permission_callback' => function () {
+                return true; //No need to check permissions: Webhook Signature is checked
+                //return current_user_can('manage_options');
+            }
         )
     );
 }
