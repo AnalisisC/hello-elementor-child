@@ -705,3 +705,4 @@ function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bo
             true
         ));
 }
+
