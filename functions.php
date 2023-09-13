@@ -399,13 +399,19 @@ function mostrar_profesional_anual()
     // }
 }
 
+/**
+ * Gets logged int user JWT and Telegram, serving to the view
+ *
+ * @return void
+ */
 function nodecharts_jwt()
 {
-    $current_user = wp_get_current_user(); // Obtiene el usuario actualmente autenticado
+    $current_user = wp_get_current_user();
     if ($current_user instanceof WP_User) {
         $user_hash = get_user_meta($current_user->ID, 'hash', true);
+        $user_telegram = get_user_meta($current_user->ID, 'telegram', true);
         if ($user_hash)
-            echo '<script>window.jwt="' . $user_hash . '"</script>';
+            echo '<script>window.jwt="' . $user_hash . '";window.telegram="' . $user_telegram . '"</script>';
     }
 }
 add_shortcode('nodecharts_jwt', 'nodecharts_jwt');
@@ -705,4 +711,3 @@ function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bo
             true
         ));
 }
-
