@@ -262,13 +262,13 @@ function mostrar_principiante_mensual(): string
             $res = '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" 
                 data-product_id="356" data-product_sku="principiante-mensual" 
                 class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-                <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+                <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
         $res = '<a rel="nofollow" href="?add-to-cart=356" data-quantity="1" 
                 data-product_id="356" data-product_sku="principiante-mensual" 
                 class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-                <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+                <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
     }
     return $res;
 }
@@ -289,13 +289,13 @@ function mostrar_principiante_anual(): string
             $res = '<a rel="nofollow" href="?add-to-cart=358" data-quantity="1" 
             data-product_id="358" data-product_sku="principiante-anual" 
             class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-            <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
         $res = '<a rel="nofollow" href="?add-to-cart=358" data-quantity="1" 
         data-product_id="358" data-product_sku="principiante-anual" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-        <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
     }
     return $res;
 }
@@ -312,13 +312,13 @@ function mostrar_experto_mensual(): string
             $res = '<a rel="nofollow" href="?add-to-cart=360" data-quantity="1" 
             data-product_id="360" data-product_sku="experto-mensual" 
             class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-            <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
         $res = '<a rel="nofollow" href="?add-to-cart=360" data-quantity="1" 
         data-product_id="360" data-product_sku="experto-mensual" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-        <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
     }
     return $res;
 }
@@ -335,13 +335,13 @@ function mostrar_experto_anual(): string
             $res = '<a rel="nofollow" href="?add-to-cart=361" data-quantity="1"
             data-product_id="361" data-product_sku="experto-anual" 
             class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-            <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+            <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
         }
     } else {
         $res = '<a rel="nofollow" href="?add-to-cart=361" data-quantity="1"
         data-product_id="361" data-product_sku="experto-anual" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-        <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') . '</p></div></a>';
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') . '</p></div></a>';
     }
     return $res;
 }
@@ -384,7 +384,7 @@ function mostrar_profesional_anual()
         return '<a rel="prerender" href="?add-to-cart=362" data-quantity="1" 
         data-product_id="362" data-product_sku="profesional-anual" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
-        <div class="boton"><p>' . esc_html__("Buy!", 'nodechartsfam') .
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
             '</p></div></a>';
     }
     // } else {
