@@ -403,19 +403,18 @@ dd, dl, dt, li, ol, ul {
 }
 
 .added_to_cart {
-    display: none !important
+    display: none;
 }
 
 .boton a:hover {
-    color: #fff !important
+    color: #fff;
 }
 
 .boton {
-    border-radius: 30px 30px 30px 30px !important;
+    border-radius: 30px 30px 30px 30px;
     text-align: center;
     border: 2px solid;
-    border-radius: 0;
-    padding: 9px !important;
+    padding: 9px ;
     font-size: 15px;
     transition: all .3s;
     letter-spacing: 1px;
@@ -426,7 +425,6 @@ dd, dl, dt, li, ol, ul {
 }
 
 .boton:hover {
-    border: 1px solid #06f;
     background-color: #06f;
     color: #fff !important
 }
