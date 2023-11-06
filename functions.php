@@ -528,7 +528,8 @@ function custom_api_get_translation_links($req): array
         $trid = apply_filters('wpml_element_trid', NULL, $page->ID, 'post_page');
         if ($trid) {
             $trans = apply_filters('wpml_get_element_translations', null, $trid, 'post_page');
-            $trans = ($lang == 'en' ? '/en/' : '/') . get_post($trans[$lang]->element_id)->post_name;
+            $trans = ($lang == 'en' ? '/en/' : '/') .
+                get_post($trans[$lang]->element_id)?->post_name;
         }
     } else {
         $trans = ($lang == 'en' ? '/en/' : '/');
