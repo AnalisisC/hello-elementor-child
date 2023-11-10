@@ -655,10 +655,12 @@ function delete_usercache($req)
             urlencode($username) . '-';
         if (file_exists($path)) {
             deleteDirRecursively($path);
-            wp_send_json_success(array('message' => "OK [$path] removed."));
+            wp_send_json_success(array('message' => "OK. deleting cache path [$path]."));
         } else {
-            wp_send_json_error(array('message' => "KO [$path] not found."));
+            wp_send_json_success(array('message' => "OK. Cache path [$path] not found."));
         }
+    } else {
+        wp_send_json_error(array('message' => "Invalid signature."));
     }
 }
 
