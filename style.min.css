@@ -260,14 +260,14 @@ button, select {
 [type=button], [type=submit], button {
     display: inline-block;
     font-weight: 400;
-    color: #c36;
+    /* color: #c36; */
     text-align: center;
     white-space: nowrap;
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
     background-color: transparent;
-    border: 1px solid #c36;
+    /* border: 1px solid #c36; */
     padding: .5rem 1rem;
     font-size: 1rem;
     border-radius: 3px;
@@ -279,8 +279,8 @@ button, select {
 }
 
 [type=button]:focus, [type=button]:hover, [type=submit]:focus, [type=submit]:hover, button:focus, button:hover {
-    color: #fff;
-    background-color: #c36;
+    /* color: #fff;
+    background-color: #c36; */
     text-decoration: none
 }
 
