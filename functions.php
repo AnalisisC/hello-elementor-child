@@ -728,23 +728,18 @@ if (ENV == 'dev')
 
 function addFreeSubscriptionToNewUser($userId)
 {
-
     $prodFac = new \WC_Product_Factory();
     $product = $prodFac->get_product(356); //Principiante mensual
-
     //error_log("Adding subscription to user $userId");
-
     $order = new \WC_Order();
     $order->set_customer_id($userId);
     $order->add_item($product, 1);
     $order->set_total(0);
     $order->set_status('completed');
     $order->save();
-
     $subscription = new \WC_Subscription();
     $subscription->set_parent_id($order->get_id());
     $subscription->add_product($product, 1);
-    //$subscription->set_status('pending', 'Preparando usuario gratuito', true);
     $subscription->set_customer_id($userId);
     $subscription->set_date_created(date('Y-m-d H:m:s'));
     $subscription->set_billing_period('month');
@@ -752,12 +747,35 @@ function addFreeSubscriptionToNewUser($userId)
     //$order->set_parent_id($subscription->get_id());
     $subscription->update_dates([
         // Remove two seconds because end > next_payment is required
-        'next_payment' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2),
+        'next_payment' => date(
+            'Y-m-d H:i:s',
+            strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2
+        ),
         'end' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month'))
     ]);
+    //$subscription->set_status('pending', 'Preparando usuario gratuito', true);
     $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
     $subscription->save();
     // error_log(var_export($subscription, true));
 }
 if (ENV == 'dev')
     add_action('user_register', 'addFreeSubscriptionToNewUser');
+
+
+function custom_filter_payment_gateways($gateways)
+{
+  
+    $user_id = get_current_user_id();
+    //   if (user_can($user_id, 'manage_options')) {
+    if ($user_id == 186) {
+        $gateways['cod'] = new \WC_Gateway_COD();
+        return $gateways;
+    }
+    // Usuario regular, deshabilitar el segundo método de pago
+    unset($gateways['cod']);
+    return $gateways;
+}
+
+// Aplicar el filtro
+if (ENV == 'dev')
+    add_filter('woocommerce_available_payment_gateways', 'custom_filter_payment_gateways');
