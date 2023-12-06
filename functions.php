@@ -481,7 +481,7 @@ $(\'.checkout_coupon\').show();});</script>';
  */
 function overrule_webhook_disable_limit($number)
 {
-    return 999999999999; //very high number hopefully you'll never reach.
+    return 10000; //very high number hopefully you'll never reach.
 }
 add_filter('woocommerce_max_webhook_delivery_failures', 'overrule_webhook_disable_limit');
 
@@ -714,3 +714,50 @@ function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bo
             true
         ));
 }
+
+function ReactAPIauth()
+{
+    wp_localize_script('wp-api', 'WP_API_Settings', array(
+        'root' => esc_url_raw(rest_url()),
+        'nonce' => wp_create_nonce('wp_rest')
+    ));
+}
+if (ENV == 'dev')
+    add_action('wp_enqueue_scripts', 'ReactAPIauth');
+
+
+function addFreeSubscriptionToNewUser($userId)
+{
+
+    $prodFac = new \WC_Product_Factory();
+    $product = $prodFac->get_product(356); //Principiante mensual
+
+    //error_log("Adding subscription to user $userId");
+
+    $order = new \WC_Order();
+    $order->set_customer_id($userId);
+    $order->add_item($product, 1);
+    $order->set_total(0);
+    $order->set_status('completed');
+    $order->save();
+
+    $subscription = new \WC_Subscription();
+    $subscription->set_parent_id($order->get_id());
+    $subscription->add_product($product, 1);
+    //$subscription->set_status('pending', 'Preparando usuario gratuito', true);
+    $subscription->set_customer_id($userId);
+    $subscription->set_date_created(date('Y-m-d H:m:s'));
+    $subscription->set_billing_period('month');
+    $subscription->set_start_date(date('Y-m-d H:m:s'));
+    //$order->set_parent_id($subscription->get_id());
+    $subscription->update_dates([
+        // Remove two seconds because end > next_payment is required
+        'next_payment' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2),
+        'end' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month'))
+    ]);
+    $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
+    $subscription->save();
+    // error_log(var_export($subscription, true));
+}
+if (ENV == 'dev')
+    add_action('user_register', 'addFreeSubscriptionToNewUser');
