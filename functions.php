@@ -762,9 +762,17 @@ if (ENV == 'dev')
     add_action('user_register', 'addFreeSubscriptionToNewUser');
 
 
-function custom_filter_payment_gateways($gateways)
+
+/**
+ * WARNING: THIS METHOD ALLOWS TO USER 186 miguelgilmartinez@gmail.com
+ * to make purchases cashh on delivery. Do not keep it enabled.
+ *
+ * @param [type] $gateways
+ * @return void
+
+function add_cash_on_delivery_to_miguelgilmartinez($gateways)
 {
-  
+
     $user_id = get_current_user_id();
     //   if (user_can($user_id, 'manage_options')) {
     if ($user_id == 186) {
@@ -775,7 +783,8 @@ function custom_filter_payment_gateways($gateways)
     unset($gateways['cod']);
     return $gateways;
 }
-
-// Aplicar el filtro
 // if (ENV == 'dev')
-    add_filter('woocommerce_available_payment_gateways', 'custom_filter_payment_gateways');
+    add_filter('woocommerce_available_payment_gateways', 'add_cash_on_delivery_to_miguelgilmartinez');
+ 
+ * END OF add_cash_on_delivery_to_miguelgilmartinez
+ */
