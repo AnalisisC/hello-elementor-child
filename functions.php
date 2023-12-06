@@ -777,5 +777,5 @@ function custom_filter_payment_gateways($gateways)
 }
 
 // Aplicar el filtro
-if (ENV == 'dev')
+// if (ENV == 'dev')
     add_filter('woocommerce_available_payment_gateways', 'custom_filter_payment_gateways');
