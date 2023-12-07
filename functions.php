@@ -715,15 +715,15 @@ function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bo
         ));
 }
 
-function ReactAPIauth()
-{
-    wp_localize_script('wp-api', 'WP_API_Settings', array(
-        'root' => esc_url_raw(rest_url()),
-        'nonce' => wp_create_nonce('wp_rest')
-    ));
-}
-if (ENV == 'dev')
-    add_action('wp_enqueue_scripts', 'ReactAPIauth');
+// function ReactAPIauth()
+// {
+//     wp_localize_script('wp-api', 'WP_API_Settings', array(
+//         'root' => esc_url_raw(rest_url()),
+//         'nonce' => wp_create_nonce('wp_rest')
+//     ));
+// }
+// if (ENV == 'dev')
+//     add_action('wp_enqueue_scripts', 'ReactAPIauth');
 
 
 function userWasRemoved(int $userId): bool
