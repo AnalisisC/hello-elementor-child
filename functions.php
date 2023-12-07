@@ -725,6 +725,17 @@ function ReactAPIauth()
 if (ENV == 'dev')
     add_action('wp_enqueue_scripts', 'ReactAPIauth');
 
+
+function userWasRemoved(int $userId): bool
+{
+    $hash = hash('sha256', get_userdata($userId)->user_email);
+    $redis = new Redis();
+    $redis->connect('localhost', 6379);
+    $result = $redis->sismember('deleted_users', $hash);
+    $redis->close();
+    return (bool)$result;
+}
+
 /**
  * Add a month free subscription 
  *
@@ -733,31 +744,26 @@ if (ENV == 'dev')
  */
 function addFreeSubscriptionToNewUser($userId)
 {
-    // $prodFac = new \WC_Product_Factory();
-    // $product = $prodFac->get_product(356); //Principiante mensual
-    $product = wc_get_product(356); //Principiante mensual
-    $order = new \WC_Order();
-    $order->set_customer_id($userId);
-    $order->add_item($product, 1);
-    $order->set_total(0);
-    $order->set_status('completed');
-   // $order->save();
-    $subscription = new \WC_Subscription();
-    $subscription->set_customer_id($userId);
-    $subscription->add_product($product, 1);
-    $subscription->set_parent_id($order->get_id());
-
-    $subscription->set_date_created(date('Y-m-d H:m:s'));
-    $subscription->set_billing_period('month');
-    $subscription->set_start_date(date('Y-m-d H:m:s'));
-    //$order->set_parent_id($subscription->get_id());
-    $nextPay = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2);
-    $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month'));
-    $subscription->update_dates(['next_payment' => $nextPay,  'end' => $endDate]);
-    //$subscription->set_status('pending', 'Preparando usuario gratuito', true);
-    $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
-    $subscription->save();
-    // error_log(var_export($subscription, true));
+    if (!userWasRemoved($userId)) {
+        $product = wc_get_product(356); //Principiante mensual
+        $order = new \WC_Order();
+        $order->set_customer_id($userId);
+        $order->add_item($product, 1);
+        $order->set_total(0);
+        $order->set_status('completed');
+        $subscription = new \WC_Subscription();
+        $subscription->set_customer_id($userId);
+        $subscription->add_product($product, 1);
+        $subscription->set_parent_id($order->get_id());
+        $subscription->set_date_created(date('Y-m-d H:m:s'));
+        $subscription->set_billing_period('month');
+        $subscription->set_start_date(date('Y-m-d H:m:s'));
+        $nextPay = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2);
+        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month'));
+        $subscription->update_dates(['next_payment' => $nextPay,  'end' => $endDate]);
+        $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
+        $subscription->save();
+    }
 }
 if (ENV == 'dev')
     add_action('user_register', 'addFreeSubscriptionToNewUser');
@@ -789,3 +795,20 @@ function add_cash_on_delivery_to_miguelgilmartinez($gateways)
  
  * END OF add_cash_on_delivery_to_miguelgilmartinez
  */
+
+
+/**
+ * Add deleted email to a redis database.
+ * Useful to check when user are returning back
+ *
+ * @param int $user_id
+ * @return void
+ */
+function custom_user_delete_action($user_id): void
+{
+    $redis = new Redis();
+    $redis->connect('localhost', 6379);
+    $redis->sadd('deleted_users', hash('sha256', get_userdata($user_id)->user_email));
+    $redis->close();
+}
+add_action('delete_user', 'custom_user_delete_action');
