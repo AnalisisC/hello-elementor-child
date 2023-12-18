@@ -715,15 +715,15 @@ function checkWebhookSignature(string $x_wc_webhook_signature, string $body): bo
         ));
 }
 
-// function ReactAPIauth()
-// {
-//     wp_localize_script('wp-api', 'WP_API_Settings', array(
-//         'root' => esc_url_raw(rest_url()),
-//         'nonce' => wp_create_nonce('wp_rest')
-//     ));
-// }
-// if (ENV == 'dev')
-//     add_action('wp_enqueue_scripts', 'ReactAPIauth');
+function ReactAPIauth()
+{
+    wp_localize_script('wp-api', 'WP_API_Settings', array(
+        'root' => esc_url_raw(rest_url()),
+        'nonce' => wp_create_nonce('wp_rest')
+    ));
+}
+if (ENV == 'dev')
+    add_action('wp_enqueue_scripts', 'ReactAPIauth');
 
 
 function userWasRemoved(int $userId): bool
@@ -812,3 +812,66 @@ function custom_user_delete_action($user_id): void
     $redis->close();
 }
 add_action('delete_user', 'custom_user_delete_action');
+
+
+function add_cors_http_header()
+{
+    header("Access-Control-Allow-Origin: *");
+}
+if (ENV == 'dev')
+    add_action('init', 'add_cors_http_header');
+
+
+// function prefix_show_request_headers($result, $server, $request)
+// {
+//     return $request->get_headers();
+// }
+// if (ENV == 'dev')
+//     add_filter('rest_pre_dispatch', 'prefix_show_request_headers', 10, 3);
+
+// add_filter('rest_authentication_errors', function ($result) {
+//     // If a previous authentication check was applied,
+//     // pass that result along without modification.
+//     if (true === $result || is_wp_error($result)) {
+//         return $result;
+//     }
+
+//     // No authentication has been performed yet.
+//     // Return an error if user is not logged in.
+//     if (!is_user_logged_in()) {
+//         return new WP_Error(
+//             'rest_not_logged_in',
+//             __('xxxYou are not currently logged in.'),
+//             array('status' => 401)
+//         );
+//     }
+
+//     // Our custom authentication check should have no effect
+//     // on logged-in requests
+//     return $result;
+// });
+
+
+/**
+ * Show the banner when a html element with class 'cmplz-show-banner' is clicked
+ */
+function cmplz_show_banner_on_click()
+{
+?>
+    <script>
+        function addEvent(event, selector, callback, context) {
+            document.addEventListener(event, e => {
+                if (e.target.closest(selector)) {
+                    callback(e);
+                }
+            });
+        }
+        addEvent('click', '.cmplz-show-banner', function() {
+            document.querySelectorAll('.cmplz-manage-consent').forEach(obj => {
+                obj.click();
+            });
+        });
+    </script>
+<?php
+}
+add_action('wp_footer', 'cmplz_show_banner_on_click');
