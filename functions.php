@@ -737,7 +737,7 @@ function userWasRemoved(int $userId): bool
 }
 
 /**
- * Add a month free subscription 
+ * Add a 15 days free subscription 
  *
  * @param [type] $userId
  * @return void
@@ -758,8 +758,8 @@ function addFreeSubscriptionToNewUser($userId)
         $subscription->set_date_created(date('Y-m-d H:m:s'));
         $subscription->set_billing_period('month');
         $subscription->set_start_date(date('Y-m-d H:m:s'));
-        $nextPay = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month') - 2);
-        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +1 month'));
+        $nextPay = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days') - 2);
+        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days'));
         $subscription->update_dates(['next_payment' => $nextPay,  'end' => $endDate]);
         $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
         $subscription->save();
