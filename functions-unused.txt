@@ -1,0 +1,41 @@
+/**
+ * WARNING: THIS METHOD ALLOWS TO USER 186 miguelgilmartinez@gmail.com
+ * to make purchases cashh on delivery. Do not keep it enabled.
+ *
+ * @param [type] $gateways
+ * @return void
+
+function add_cash_on_delivery_to_miguelgilmartinez($gateways)
+{
+
+    $user_id = get_current_user_id();
+    //   if (user_can($user_id, 'manage_options')) {
+    if ($user_id == 186) {
+        $gateways['cod'] = new \WC_Gateway_COD();
+        return $gateways;
+    }
+    // Usuario regular, deshabilitar el segundo método de pago
+    unset($gateways['cod']);
+    return $gateways;
+}
+// if (ENV == 'dev')
+    add_filter('woocommerce_available_payment_gateways', 'add_cash_on_delivery_to_miguelgilmartinez');
+
+ * END OF add_cash_on_delivery_to_miguelgilmartinez
+ */
+
+ /**
+ * Sync Gatekeeper with Shop orders
+ * 
+ * @param  int $order_id * 
+ * @return Return.
+ */
+function syncronizeOrdersWhenComplete($order_id)
+{
+    //$order = new WC_Order($order_id);
+    global $current_user;
+    error_log(json_encode(getActiveSubscriptionObj($current_user->ID)));
+    error_log("\n\nOrder completed!!!!!!!!!: " . $order_id);
+}
+
+// IN DEVELOPMENT add_action('woocommerce_order_status_completed', 'syncronizeOrdersWhenComplete');

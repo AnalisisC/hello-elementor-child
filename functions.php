@@ -399,6 +399,14 @@ function mostrar_profesional_anual()
     // }
 }
 
+function getUserJWT($user): ?string
+{
+    if ($user instanceof WP_User) {
+        $user_hash = get_user_meta($user->ID, 'hash', true);
+    }
+    return $user_hash ?? null;
+}
+
 /**
  * Gets logged int user JWT and Telegram, serving to the view
  *
@@ -407,15 +415,21 @@ function mostrar_profesional_anual()
 function nodecharts_jwt()
 {
     $current_user = wp_get_current_user();
-    if ($current_user instanceof WP_User) {
-        $user_hash = get_user_meta($current_user->ID, 'hash', true);
-        $user_telegram = get_user_meta($current_user->ID, 'telegram', true);
-        if ($user_hash)
-            echo '<script>window.jwt="' . $user_hash . '";window.telegram="' . $user_telegram . '"</script>';
+    $user_telegram = get_user_meta($current_user->ID, 'telegram', true);
+    $user_hash = getUserJWT($current_user);
+    if ($user_hash) {
+        echo '<script>window.jwt="' . $user_hash . '";window.telegram="' .
+            $user_telegram . '"</script>';
     }
 }
 add_shortcode('nodecharts_jwt', 'nodecharts_jwt');
 
+/**
+ * Get subscription name "I.e.: Principiante mensual"
+ *
+ * @param integer $userId
+ * @return string
+ */
 function getActiveSubscription2(int $userId): string
 {
     $nombremembresia = get_transient('getActiveSubs' . $userId);
@@ -696,7 +710,6 @@ function deleteDirRecursively($dir)
     }
 }
 
-
 /**
  * Checks webhook signature. 
  *
@@ -769,34 +782,6 @@ if (ENV == 'dev')
     add_action('user_register', 'addFreeSubscriptionToNewUser');
 
 
-
-/**
- * WARNING: THIS METHOD ALLOWS TO USER 186 miguelgilmartinez@gmail.com
- * to make purchases cashh on delivery. Do not keep it enabled.
- *
- * @param [type] $gateways
- * @return void
-
-function add_cash_on_delivery_to_miguelgilmartinez($gateways)
-{
-
-    $user_id = get_current_user_id();
-    //   if (user_can($user_id, 'manage_options')) {
-    if ($user_id == 186) {
-        $gateways['cod'] = new \WC_Gateway_COD();
-        return $gateways;
-    }
-    // Usuario regular, deshabilitar el segundo método de pago
-    unset($gateways['cod']);
-    return $gateways;
-}
-// if (ENV == 'dev')
-    add_filter('woocommerce_available_payment_gateways', 'add_cash_on_delivery_to_miguelgilmartinez');
- 
- * END OF add_cash_on_delivery_to_miguelgilmartinez
- */
-
-
 /**
  * Add deleted email to a redis database.
  * Useful to check when user are returning back
@@ -813,14 +798,14 @@ function custom_user_delete_action($user_id): void
 }
 add_action('delete_user', 'custom_user_delete_action');
 
-
+/*
 function add_cors_http_header()
 {
     header("Access-Control-Allow-Origin: *");
 }
 if (ENV == 'dev')
     add_action('init', 'add_cors_http_header');
-
+*/
 
 // function prefix_show_request_headers($result, $server, $request)
 // {
@@ -875,3 +860,25 @@ function cmplz_show_banner_on_click()
 <?php
 }
 add_action('wp_footer', 'cmplz_show_banner_on_click');
+
+/**
+ * Get subscription full object
+ * @param integer $userId
+ * @return object
+ */
+function getActiveSubscriptionObj(int $userId): ?array
+{
+    $subscriptions = wcs_get_users_subscriptions($userId);
+    foreach ($subscriptions as $subscr) {
+        if ($subscr->has_status(array('active', 'pending-cancel'))) {
+            $items = wcs_get_subscription($subscr->get_id())->get_items();
+            foreach ($items as $item) {
+                $product = $item->get_product();
+                $membership['name'] = $product->get_name();
+                $membership['id'] = $product->get_meta('sku');
+                break 2;
+            }
+        }
+    }
+    return $membership ?? null;
+}
