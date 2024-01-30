@@ -774,8 +774,8 @@ function addFreeSubscriptionToNewUser($userId)
         $subscription->set_date_created(date('Y-m-d H:m:s'));
         //$subscription->set_billing_period('day');
         $subscription->set_start_date(date('Y-m-d H:m:s'));
-        $nextDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes') - 2);
-        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes'));
+        $nextDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days') - 2);
+        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days'));
         $subscription->update_dates(['next_payment' => $nextDate,  'end' => $endDate]);
         //$subscription->update_dates(['end' => $endDate]);
         $subscription->set_status('active', 'Nuevo usuario 15 días gratis principiante', true);
