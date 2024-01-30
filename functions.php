@@ -751,14 +751,17 @@ function userWasRemoved(int $userId): bool
 
 /**
  * Add a 15 days free subscription 
- *
+ * Instructions: 
+ * * Pause ClienteCreado weebhook, not needed.
+ * * 
  * @param [type] $userId
  * @return void
  */
 function addFreeSubscriptionToNewUser($userId)
 {
     if (!userWasRemoved($userId)) {
-        $product = wc_get_product(356); //Principiante mensual
+        $product = wc_get_product(25729); // Gratis 15 días
+        //$product = wc_get_product(356); //Principiante mensual
         $order = new \WC_Order();
         $order->set_customer_id($userId);
         $order->add_item($product, 1);
@@ -769,12 +772,13 @@ function addFreeSubscriptionToNewUser($userId)
         $subscription->add_product($product, 1);
         $subscription->set_parent_id($order->get_id());
         $subscription->set_date_created(date('Y-m-d H:m:s'));
-        $subscription->set_billing_period('month');
+        //$subscription->set_billing_period('day');
         $subscription->set_start_date(date('Y-m-d H:m:s'));
-        $nextPay = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days') - 2);
-        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days'));
-        $subscription->update_dates(['next_payment' => $nextPay,  'end' => $endDate]);
-        $subscription->set_status('active', 'Nuevo usuario 30 días gratis - ', true);
+        $nextDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes') - 2);
+        $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes'));
+        $subscription->update_dates(['next_payment' => $nextDate,  'end' => $endDate]);
+        //$subscription->update_dates(['end' => $endDate]);
+        $subscription->set_status('active', 'Nuevo usuario 15 días gratis principiante', true);
         $subscription->save();
     }
 }
@@ -797,44 +801,6 @@ function custom_user_delete_action($user_id): void
     $redis->close();
 }
 add_action('delete_user', 'custom_user_delete_action');
-
-/*
-function add_cors_http_header()
-{
-    header("Access-Control-Allow-Origin: *");
-}
-if (ENV == 'dev')
-    add_action('init', 'add_cors_http_header');
-*/
-
-// function prefix_show_request_headers($result, $server, $request)
-// {
-//     return $request->get_headers();
-// }
-// if (ENV == 'dev')
-//     add_filter('rest_pre_dispatch', 'prefix_show_request_headers', 10, 3);
-
-// add_filter('rest_authentication_errors', function ($result) {
-//     // If a previous authentication check was applied,
-//     // pass that result along without modification.
-//     if (true === $result || is_wp_error($result)) {
-//         return $result;
-//     }
-
-//     // No authentication has been performed yet.
-//     // Return an error if user is not logged in.
-//     if (!is_user_logged_in()) {
-//         return new WP_Error(
-//             'rest_not_logged_in',
-//             __('xxxYou are not currently logged in.'),
-//             array('status' => 401)
-//         );
-//     }
-
-//     // Our custom authentication check should have no effect
-//     // on logged-in requests
-//     return $result;
-// });
 
 
 /**
