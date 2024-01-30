@@ -782,8 +782,8 @@ function addFreeSubscriptionToNewUser($userId)
         $subscription->save();
     }
 }
-if (ENV == 'dev')
-    add_action('user_register', 'addFreeSubscriptionToNewUser');
+//if (ENV == 'dev')
+add_action('user_register', 'addFreeSubscriptionToNewUser');
 
 
 /**
