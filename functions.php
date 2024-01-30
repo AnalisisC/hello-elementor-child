@@ -350,8 +350,6 @@ add_shortcode('profesionalmensual', 'mostrar_profesional_mensual');
 function mostrar_profesional_mensual(): string
 {
     global $current_user;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
     if ($current_user->ID) {
         $subscription = getActiveSubscription2($current_user->ID);
         if (in_array($subscription, ["Profesional Mensual", "Profesional Anual"])) {
@@ -372,8 +370,6 @@ add_shortcode('profesionalanual', 'mostrar_profesional_anual');
 function mostrar_profesional_anual()
 {
     global $current_user;
-    // wp_get_current_user();
-    // add_filter('widget_text', 'apply_shortcodes');
     if (
         $current_user->ID &&
         getActiveSubscription2($current_user->ID) == "Profesional Anual"
@@ -387,16 +383,25 @@ function mostrar_profesional_anual()
         <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
             '</p></div></a>';
     }
-    // } else {
-    //     $my_current_lang = apply_filters('wpml_current_language', null);
-    //     if ($my_current_lang == "es") {
-    //         return '<a class="link-pricing" href="https://nodecharts.com/registrarse"><div class="boton"><p>'
-    //             . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
-    //     } else {
-    //         return '<a class="link-pricing" href="https://nodecharts.com/en/sign-up"><div class="boton"><p>'
-    //             . esc_html__("Sign up", 'nodechartsfam') . '</p></div></a>';
-    //     }
-    // }
+}
+
+add_shortcode('principiantecurso', 'principianteCurso');
+function principianteCurso()
+{
+    global $current_user;
+    if (
+        $current_user->ID &&
+        getActiveSubscription2($current_user->ID) == "Principiante Curso"
+    ) {
+        return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
+            '</b></p></div>';
+    } else {
+        return '<a rel="prerender" href="?add-to-cart=15882" data-quantity="1" 
+        data-product_id="15882" data-product_sku="10_curso" 
+        class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
+            '</p></div></a>';
+    }
 }
 
 function getUserJWT($user): ?string
@@ -752,6 +757,7 @@ function userWasRemoved(int $userId): bool
  * Instructions: 
  * * Pause ClienteCreado weebhook, not needed.
  * * Add product and set id 
+ * * Disable env="dev"
  * @param [type] $userId
  * @return void
  */
@@ -780,8 +786,8 @@ function addFreeSubscriptionToNewUser($userId)
         $subscription->save();
     }
 }
-//if (ENV == 'dev')
-add_action('user_register', 'addFreeSubscriptionToNewUser');
+if (ENV == 'dev')
+    add_action('user_register', 'addFreeSubscriptionToNewUser');
 
 
 /**
