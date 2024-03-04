@@ -377,7 +377,7 @@ function mostrar_profesional_anual()
         return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
             '</b></p></div>';
     } else {
-        return '<a rel="prerender" href="?add-to-cart=362" data-quantity="1" 
+        return '<a href="?add-to-cart=362" data-quantity="1" 
         data-product_id="362" data-product_sku="profesional-anual" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
         <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
@@ -396,7 +396,7 @@ function principianteCurso()
         return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
             '</b></p></div>';
     } else {
-        return '<a rel="prerender" href="?add-to-cart=15882" data-quantity="1" 
+        return '<a href="?add-to-cart=15882" data-quantity="1" 
         data-product_id="15882" data-product_sku="10_curso" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
         <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
@@ -415,7 +415,7 @@ function expertoCurso()
         return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
             '</b></p></div>';
     } else {
-        return '<a rel="prerender" href="?add-to-cart=30445" data-quantity="1" 
+        return '<a href="?add-to-cart=30445" data-quantity="1" 
         data-product_id="30445" data-product_sku="20_curso" 
         class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
         <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
