@@ -404,6 +404,25 @@ function principianteCurso()
     }
 }
 
+add_shortcode('expertocurso', 'expertoCurso');
+function expertoCurso()
+{
+    global $current_user;
+    if (
+        $current_user->ID &&
+        getActiveSubscription2($current_user->ID) == "Experto Curso"
+    ) {
+        return '<div><p><b>' . esc_html__("Active!", 'nodechartsfam') .
+            '</b></p></div>';
+    } else {
+        return '<a rel="prerender" href="?add-to-cart=30445" data-quantity="1" 
+        data-product_id="30445" data-product_sku="20_curso" 
+        class="button product_type_simple add_to_cart_button ajax_add_to_cart added">
+        <div class="boton"><p>' . esc_html__("Get access", 'nodechartsfam') .
+            '</p></div></a>';
+    }
+}
+
 function getUserJWT($user): ?string
 {
     if ($user instanceof WP_User) {
