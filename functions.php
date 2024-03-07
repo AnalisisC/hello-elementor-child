@@ -801,7 +801,7 @@ function addFreeSubscriptionToNewUser($userId)
         $endDate = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +15 days'));
         $subscription->update_dates(['next_payment' => $nextPay,  'end' => $endDate]);
         //$subscription->update_dates(['end' => $endDate]);
-        $subscription->set_status('active', 'Nuevo usuario 15 días gratis principiante', true);
+        $subscription->set_status('pending-cancel', 'Nuevo usuario 15 días gratis principiante', true);
         $subscription->save();
     }
 }
