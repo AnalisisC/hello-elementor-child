@@ -783,7 +783,7 @@ function userWasRemoved(int $userId): bool
 function addFreeSubscriptionToNewUser($userId)
 {
     if (!userWasRemoved($userId)) {
-        $product = wc_get_product(356); // Gratis 15 días
+        $product = wc_get_product(32232); // Gratis 15 días
         //$product = wc_get_product(356); //Principiante mensual
         $order = new \WC_Order();
         $order->set_customer_id($userId);
