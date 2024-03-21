@@ -693,7 +693,7 @@ function delete_usercache($req)
             deleteDirRecursively($path);
             wp_send_json_success(array('message' => "OK. deleting cache path [$path]."));
         } else {
-            wp_send_json_success(array('message' => "OK. Cache path [$path] not found."));
+            wp_send_json_success(array('message' => "KO. Cache path [$path] not found for removal."));
         }
     } else {
         wp_send_json_error(array('message' => "Invalid signature."));
@@ -832,20 +832,20 @@ add_action('delete_user', 'custom_user_delete_action');
 function cmplz_show_banner_on_click()
 {
 ?>
-    <script>
-        function addEvent(event, selector, callback, context) {
-            document.addEventListener(event, e => {
-                if (e.target.closest(selector)) {
-                    callback(e);
-                }
-            });
+<script>
+function addEvent(event, selector, callback, context) {
+    document.addEventListener(event, e => {
+        if (e.target.closest(selector)) {
+            callback(e);
         }
-        addEvent('click', '.cmplz-show-banner', function() {
-            document.querySelectorAll('.cmplz-manage-consent').forEach(obj => {
-                obj.click();
-            });
-        });
-    </script>
+    });
+}
+addEvent('click', '.cmplz-show-banner', function() {
+    document.querySelectorAll('.cmplz-manage-consent').forEach(obj => {
+        obj.click();
+    });
+});
+</script>
 <?php
 }
 add_action('wp_footer', 'cmplz_show_banner_on_click');
@@ -870,4 +870,14 @@ function getActiveSubscriptionObj(int $userId): ?array
         }
     }
     return $membership ?? null;
+}
+
+/**
+ * Clean cart on any product selection.
+ */
+add_filter('woocommerce_add_to_cart_validation', 'only_one_in_cart', 9999);
+function only_one_in_cart($cart)
+{
+    wc_empty_cart();
+    return $cart;
 }
